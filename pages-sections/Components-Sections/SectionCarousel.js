@@ -4,7 +4,7 @@ import Carousel from 'react-slick';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 // @material-ui/icons
-import LocationOn from '@material-ui/icons/LocationOn';
+// import LocationOn from '@material-ui/icons/LocationOn';
 // core components
 import GridContainer from 'components/Grid/GridContainer.js';
 import GridItem from 'components/Grid/GridItem.js';
@@ -33,21 +33,21 @@ export default function SectionCarousel() {
               <Carousel {...settings}>
                 <div>
                   <img
-                    src='/img/balls.jpg'
+                    src='/img/2-2gallonJugs.jpg'
                     alt='Ball glass'
                     className='slick-image'
                   />
                 </div>
                 <div>
                   <img
-                    src='/img/handonglass.jpg'
+                    src='/img/2TeaBags.jpg'
                     alt='bubbly one'
                     className='slick-image'
                   />
                 </div>
                 <div>
                   <img
-                    src='/img/bubblytwoglass.jpeg'
+                    src='/img/Booch-bottled.jpg'
                     alt='bubbly two'
                     className='slick-image'
                   />
