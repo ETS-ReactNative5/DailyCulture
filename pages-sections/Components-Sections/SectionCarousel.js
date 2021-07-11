@@ -40,15 +40,23 @@ export default function SectionCarousel() {
                 </div>
                 <div>
                   <img
-                    src='/img/2TeaBags.jpg'
-                    alt='bubbly one'
+                    src='/img/Ginger.png'
+                    alt='ginger'
+                    className='slick-image'
+                  />
+                </div>
+
+                <div>
+                  <img
+                    src='/img/Booch-bottled.jpg'
+                    alt='bubbly two'
                     className='slick-image'
                   />
                 </div>
                 <div>
                   <img
-                    src='/img/Booch-bottled.jpg'
-                    alt='bubbly two'
+                    src='/img/Strawberries.png'
+                    alt='strawberries'
                     className='slick-image'
                   />
                 </div>

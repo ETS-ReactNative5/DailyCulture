@@ -4,6 +4,7 @@ import classNames from 'classnames';
 // react components for routing our app without refresh
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
+import { Typography } from '@material-ui/core';
 // @material-ui/icons
 // core components
 import Header from 'components/Header/Header.js';
@@ -19,8 +20,13 @@ import styles from 'styles/jss/nextjs-material-kit/pages/components.js';
 
 const useStyles = makeStyles(styles);
 
+const infoSection = makeStyles({
+  container: { margin: '20px', paddingTop: '20px' },
+});
+
 export default function Components(props) {
   const classes = useStyles();
+  const localClass = infoSection();
   const { ...rest } = props;
   return (
     <div>
@@ -30,7 +36,7 @@ export default function Components(props) {
         fixed
         color='transparent'
         changeColorOnScroll={{
-          height: 400,
+          height: 300,
           color: 'white',
         }}
         {...rest}
@@ -49,6 +55,20 @@ export default function Components(props) {
       </Parallax>
 
       <div className={classNames(classes.main, classes.mainRaised)}>
+        <GridContainer className={localClass.container}>
+          <div>
+            <Typography>
+              Daily Culture is all about educating and sharing experiences with
+              the KC community over a glass of locally crafted organic kombucha.
+              Kombucha is a drink full of healthy magic including tons of
+              probiotics to give you a gut check!
+            </Typography>
+          </div>
+        </GridContainer>
+        <Typography
+          className={localClass.infoSection}
+          variant='subtitle1'
+        ></Typography>
         <SectionCarousel />
       </div>
       <Footer />

@@ -67,7 +67,7 @@ export default function Header(props) {
       <Toolbar className={classes.container}>
         <div className={classes.flex}>
           <Button href='/' className={classes.title}>
-            Home
+            <img src='img/logos/logo_size_custom.jpg' alt='Home' />
           </Button>
         </div>
         <Hidden smDown implementation='css'>

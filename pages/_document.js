@@ -27,12 +27,7 @@ class MyDocument extends Document {
           />
           <meta charSet='utf-8' />
           <meta name='theme-color' content='#000000' />
-          <link rel='shortcut icon' href='/img/bubblytwo.jpeg' />
-          <link
-            rel='apple-touch-icon'
-            sizes='76x76'
-            href='/img/apple-icon.png'
-          />
+          <link rel='shortcut icon' href='/img/logos/DC_blue_logo_size.jpg' />
           {/* Fonts and icons */}
           <link
             rel='stylesheet'
