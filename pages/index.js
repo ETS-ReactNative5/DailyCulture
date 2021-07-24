@@ -36,7 +36,7 @@ export default function Components(props) {
         fixed
         color='transparent'
         changeColorOnScroll={{
-          height: 300,
+          height: 200,
           color: 'white',
         }}
         {...rest}
@@ -57,7 +57,7 @@ export default function Components(props) {
       <div className={classNames(classes.main, classes.mainRaised)}>
         <GridContainer className={localClass.container}>
           <div>
-            <Typography>
+            <Typography variant='h5'>
               Daily Culture is all about educating and sharing experiences with
               the KC community over a glass of locally crafted organic kombucha.
               Kombucha is a drink full of healthy magic including tons of

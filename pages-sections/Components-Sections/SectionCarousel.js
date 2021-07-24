@@ -22,49 +22,47 @@ export default function SectionCarousel() {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: false,
+    autoplay: true,
   };
   return (
-    <div className={classes.section}>
-      <div className={classes.container}>
-        <GridContainer>
-          <GridItem xs={12} sm={12} md={8} className={classes.marginAuto}>
-            <Card carousel>
-              <Carousel {...settings}>
-                <div>
-                  <img
-                    src='/img/2-2gallonJugs.jpg'
-                    alt='Ball glass'
-                    className='slick-image'
-                  />
-                </div>
-                <div>
-                  <img
-                    src='/img/Ginger.png'
-                    alt='ginger'
-                    className='slick-image'
-                  />
-                </div>
+    <div className={classes.container}>
+      <GridContainer>
+        <GridItem xs={12} sm={12} md={8} className={classes.marginAuto}>
+          <Card carousel>
+            <Carousel {...settings}>
+              <div>
+                <img
+                  src='/img/2-2gallonJugs.jpg'
+                  alt='Ball glass'
+                  className='slick-image'
+                />
+              </div>
+              <div>
+                <img
+                  src='/img/Ginger.png'
+                  alt='ginger'
+                  className='slick-image'
+                />
+              </div>
 
-                <div>
-                  <img
-                    src='/img/Booch-bottled.jpg'
-                    alt='bubbly two'
-                    className='slick-image'
-                  />
-                </div>
-                <div>
-                  <img
-                    src='/img/Strawberries.png'
-                    alt='strawberries'
-                    className='slick-image'
-                  />
-                </div>
-              </Carousel>
-            </Card>
-          </GridItem>
-        </GridContainer>
-      </div>
+              <div>
+                <img
+                  src='/img/Booch-bottled.jpg'
+                  alt='bubbly two'
+                  className='slick-image'
+                />
+              </div>
+              <div>
+                <img
+                  src='/img/Strawberries.png'
+                  alt='strawberries'
+                  className='slick-image'
+                />
+              </div>
+            </Carousel>
+          </Card>
+        </GridItem>
+      </GridContainer>
     </div>
   );
 }
