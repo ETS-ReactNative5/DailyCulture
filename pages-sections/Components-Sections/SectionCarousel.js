@@ -32,6 +32,13 @@ export default function SectionCarousel() {
             <Carousel {...settings}>
               <div>
                 <img
+                  src='/img/head-brewer.jpg'
+                  alt='head brewer'
+                  className='slick-image'
+                />
+              </div>
+              <div>
+                <img
                   src='/img/2-2gallonJugs.jpg'
                   alt='Ball glass'
                   className='slick-image'

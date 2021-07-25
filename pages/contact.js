@@ -9,12 +9,12 @@ import Email from '@material-ui/icons/Email';
 
 // core components
 import GridContainer from 'components/Grid/GridContainer.js';
-import Header from 'components/Header/Header.js';
+import Layout from '../components/layout';
 import Footer from 'components/Footer/Footer.js';
 import HeaderLinks from 'components/Header/HeaderLinks.js';
 import Button from 'components/CustomButtons/Button.js';
 
-import styles from 'styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle.js';
+import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 
 const useStyles = makeStyles(styles);
 
@@ -22,51 +22,49 @@ export default function Contact() {
   const classes = useStyles();
   return (
     <>
-      <Header
-        brand='Daily Culture'
-        rightLinks={<HeaderLinks />}
-        fixed
-        color='white'
-      />
-      <div className={classes.section}>
-        <div className={classes.container}>
-          <div id='typography'>
-            <div className={classes.title}>
-              <h2>Contact Us</h2>
-            </div>
-            <GridContainer>
-              <div className={classes.typo}>
-                <h3>Send us a message on Instagram</h3>
-                <Button
-                  href='https://www.instagram.com/daily.culture.kc'
-                  target='_blank'
-                >
-                  <i className={classes.socialIcons + ' fab fa-instagram'} />
-                  Daily Culture
-                </Button>
+      <Layout>
+        <div className={classes.section}>
+          <div className={classes.container}>
+            <div id='typography'>
+              <div className={classes.title}>
+                <h2>Contact Us</h2>
               </div>
-              <div className={classes.typo}>
-                <h3>Email us</h3>
-                <Button
-                  variant='contained'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  href={`mailto:dailyculturekc@gmail.com`}
-                >
-                  <Email className={classes.icons} />
-                  <Typography variant='button' style={{ fontSize: '0.69rem' }}>
-                    Question and Comments
-                  </Typography>
-                </Button>
-                {/* <Button color='transparent' className={classes.navLink}>
+              <GridContainer>
+                <div className={classes.typo}>
+                  <h3>Send us a message on Instagram</h3>
+                  <Button
+                    href='https://www.instagram.com/daily.culture.kc'
+                    target='_blank'
+                  >
+                    <i className={classes.socialIcons + ' fab fa-instagram'} />
+                    Daily Culture
+                  </Button>
+                </div>
+                <div className={classes.typo}>
+                  <h3>Email us</h3>
+                  <Button
+                    variant='contained'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    href={`mailto:dailyculturekc@gmail.com`}
+                  >
+                    <Email className={classes.icons} />
+                    <Typography
+                      variant='button'
+                      style={{ fontSize: '0.69rem' }}
+                    >
+                      Question and Comments
+                    </Typography>
+                  </Button>
+                  {/* <Button color='transparent' className={classes.navLink}>
                   
                 </Button> */}
-              </div>
-            </GridContainer>
+                </div>
+              </GridContainer>
+            </div>
           </div>
         </div>
-      </div>
-      <Footer />
+      </Layout>
     </>
   );
 }
