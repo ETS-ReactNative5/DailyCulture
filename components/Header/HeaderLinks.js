@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Tooltip from '@material-ui/core/Tooltip';
 import Face from '@material-ui/icons/Face';
 import Email from '@material-ui/icons/Email';
 import HomeIcon from '@material-ui/icons/Home';
@@ -50,22 +49,6 @@ export default function HeaderLinks(props) {
         </Button>
       </ListItem>
       <ListItem className={classes.listItem}>
-        <Tooltip
-          id='instagram-tooltip'
-          title='Follow us on instagram'
-          placement={'top'}
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            color='transparent'
-            href='https://www.instagram.com/daily.culture.kc/'
-            target='_blank'
-            className={classes.navLink}
-          >
-            <i className={classes.socialIcons + ' fab fa-instagram'} />
-            The Gram
-          </Button>
-        </Tooltip>
       </ListItem>
       <ListItem className={classes.listItem}>
         <Button
