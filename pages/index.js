@@ -19,7 +19,12 @@ import styles from '../styles/jss/nextjs-material-kit/pages/components';
 const useStyles = makeStyles(styles);
 
 const infoSection = makeStyles({
-  container: { margin: '20px', paddingTop: '20px' },
+  container: {
+    margin: '20px',
+    paddingTop: '20px',
+    maxWidth: '900px',
+    margin: 'auto',
+  },
 });
 
 export default function Components(props) {
@@ -45,18 +50,19 @@ export default function Components(props) {
         <div className={classNames(classes.main, classes.mainRaised)}>
           <GridContainer className={localClass.container}>
             <div>
-              <Typography variant='h5'>
-                Daily Culture is all about educating and sharing experiences
-                with our community over a glass of locally crafted organic
-                kombucha. Kombucha is a drink full of healthy magic, including
-                tons of probiotics to give you a gut check!
+              <Typography
+                variant='h5'
+                align='center'
+                className={localClass.container}
+              >
+                Daily Culture was created to educate and share experiences with
+                our community over a glass of locally crafted organic kombucha.
+                Kombucha is a drink full of healthy magic, including tons of
+                probiotics to give you a gut check!
               </Typography>
             </div>
           </GridContainer>
-          <Typography
-            className={localClass.infoSection}
-            variant='subtitle1'
-          ></Typography>
+
           <SectionCarousel />
         </div>
       </Layout>
