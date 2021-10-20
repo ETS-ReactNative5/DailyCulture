@@ -34,7 +34,7 @@ export default function Components(props) {
   return (
     <div>
       <Layout>
-        <Parallax image='/img/threeglasses.jpeg'>
+        <Parallax image='/img/1-bottle-reversed-zoomout.png'>
           <div className={classes.container}>
             <GridContainer>
               <GridItem>
@@ -55,10 +55,9 @@ export default function Components(props) {
                 align='center'
                 className={localClass.container}
               >
-                Daily Culture was created to educate and share experiences with
-                our community over a glass of locally crafted organic kombucha.
-                Kombucha is a drink full of healthy magic, including tons of
-                probiotics to give you a gut check!
+                We are a Kansas City based company specializing in small batch
+                organic kombucha. Our kombucha is alive and full of healthy
+                probiotics to help keep your gut in check.
               </Typography>
             </div>
           </GridContainer>

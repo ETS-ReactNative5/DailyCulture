@@ -46,6 +46,13 @@ export default function SectionCarousel() {
               </div>
               <div>
                 <img
+                  src='/img/table-shot.png'
+                  alt='2bottles'
+                  className='slick-image'
+                />
+              </div>
+              <div>
+                <img
                   src='/img/Ginger.png'
                   alt='ginger'
                   className='slick-image'
@@ -54,7 +61,7 @@ export default function SectionCarousel() {
 
               <div>
                 <img
-                  src='/img/Booch-bottled.jpg'
+                  src='/img/booch-baby.jpg'
                   alt='bubbly two'
                   className='slick-image'
                 />
@@ -63,6 +70,13 @@ export default function SectionCarousel() {
                 <img
                   src='/img/Strawberries.png'
                   alt='strawberries'
+                  className='slick-image'
+                />
+              </div>
+              <div>
+                <img
+                  src='/img/2-empty-bottles.png'
+                  alt='2bottles'
                   className='slick-image'
                 />
               </div>
