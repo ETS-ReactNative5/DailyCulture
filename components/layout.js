@@ -4,9 +4,6 @@ import HeaderLinks from './Header/HeaderLinks';
 
 import Link from 'next/link';
 
-const name = 'Hiit KC';
-export const siteTitle = 'Hiit KC';
-
 export default function Layout({ children, home }) {
   // const { ...rest } = props;
 
@@ -16,7 +13,6 @@ export default function Layout({ children, home }) {
         brand='Daily Culture'
         rightLinks={<HeaderLinks />}
         fixed
-        color='transparent'
         changeColorOnScroll={{
           height: 200,
           color: 'white',
@@ -24,7 +20,7 @@ export default function Layout({ children, home }) {
         // {...rest}
       />
 
-      <main>{children}</main>
+      <main style={{ marginTop: '80px' }}>{children}</main>
       <Footer />
       {/* {!home && (
         <div className={styles.backToHome}>
