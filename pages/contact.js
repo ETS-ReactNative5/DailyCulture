@@ -31,6 +31,10 @@ export default function Contact() {
               </div>
               <GridContainer>
                 <div className={classes.typo}>
+                  <h2>
+                    Book a kombucha bar for your next event or have something
+                    else to tell us.
+                  </h2>
                   <h3>Send us a message on Instagram</h3>
                   <Button
                     href='https://www.instagram.com/daily.culture.kc'

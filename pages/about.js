@@ -3,13 +3,15 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 // @material-ui/icons
+import Email from '@material-ui/icons/Email';
 
 // core components
 import GridContainer from 'components/Grid/GridContainer.js';
 import Layout from '../components/layout';
 import HeaderLinks from 'components/Header/HeaderLinks.js';
+import Button from 'components/CustomButtons/Button.js';
 
-import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle'
+import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(styles);
@@ -37,22 +39,40 @@ export default function About() {
                     found was a passion to create and share. As I shared more
                     with family and friends I also had the urge to share with my
                     larger community. This sparked the idea to start Daily
-                    Culture. As a company we strive to make our community
+                    Culture. As a company, we strive to make our community
                     healthier using the best ingredients we can find. From cold
                     pressed juices, to organic fruits and herbs. No detail is
-                    too small to create a drink to satisfy the soul.
+                    too small to create a drink to satisfy the soul. What you
+                    drink matters!
                   </Typography>
                 </div>
                 <div className={classes.typo}>
                   <h3>Find us</h3>
                   <Typography>
-                    Right now you can't find us anywhere but on Social media.
-                    Our Instagram account is being leveraged to provide up to
-                    date information on where the business is. We are planning
-                    to start selling at the local Northland farmers market this
-                    summer. Until then keep following us on Instagram to find
-                    out the latest news.
+                    Follow us anywhere on Instagram for our latest events. You
+                    can find us at the Liberty Farmers market in the Spring!
                   </Typography>
+                </div>
+
+                <div className={classes.typo}>
+                  <h3>Book us</h3>
+                  <Typography>
+                    Have a kombucha bar at your next event!
+                  </Typography>
+                  <Button
+                    variant='contained'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    href={`mailto:dailyculturekc@gmail.com`}
+                  >
+                    <Email className={classes.icons} />
+                    <Typography
+                      variant='button'
+                      style={{ fontSize: '0.69rem' }}
+                    >
+                      Send Us an Email
+                    </Typography>
+                  </Button>
                 </div>
               </GridContainer>
             </div>
