@@ -10,6 +10,7 @@ import ListItem from '@material-ui/core/ListItem';
 import Face from '@material-ui/icons/Face';
 import Email from '@material-ui/icons/Email';
 import HomeIcon from '@material-ui/icons/Home';
+import LocalMallTwoToneIcon from '@mui/icons-material/LocalMallTwoTone';
 
 // @material-ui/icons
 import { Apps } from '@material-ui/icons';
@@ -40,6 +41,16 @@ export default function HeaderLinks(props) {
       </ListItem>
       <ListItem className={classes.listItem}>
         <Button
+          onClick={() => router.push('/order')}
+          color='transparent'
+          className={classes.navLink}
+        >
+          <LocalMallTwoToneIcon />
+          Order
+        </Button>
+      </ListItem>
+      <ListItem className={classes.listItem}>
+        <Button
           onClick={() => router.push('/contact')}
           color='transparent'
           className={classes.navLink}
@@ -48,8 +59,7 @@ export default function HeaderLinks(props) {
           Contact
         </Button>
       </ListItem>
-      <ListItem className={classes.listItem}>
-      </ListItem>
+      <ListItem className={classes.listItem}></ListItem>
       <ListItem className={classes.listItem}>
         <Button
           onClick={() => router.push('/')}
