@@ -19,7 +19,7 @@ const typographyStyle = {
   },
   typo: {
     padding: '5%',
-    marginBottom: '40px',
+    // marginBottom: '40px',
     position: 'relative',
     width: '100%',
   },
