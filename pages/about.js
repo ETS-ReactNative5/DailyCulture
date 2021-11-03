@@ -8,7 +8,6 @@ import Email from '@material-ui/icons/Email';
 // core components
 import GridContainer from 'components/Grid/GridContainer.js';
 import Layout from '../components/layout';
-import HeaderLinks from 'components/Header/HeaderLinks.js';
 import Button from 'components/CustomButtons/Button.js';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
@@ -29,28 +28,33 @@ export default function About() {
               </div>
               <GridContainer>
                 <div className={classes.typo}>
-                  <h3>Where did we come from</h3>
+                  <h3>Who are we</h3>
                   <Typography>
                     As we learned more about living healthy and treating our
                     body right we came accross Kombucha. It was unlike anything
                     we had ever had before. From that moment I knew this drink
-                    would be a part of me for the rest of my life. As I drank
-                    more and more I decided to do some brewing of my own. What I
-                    found was a passion to create and share. As I shared more
-                    with family and friends I also had the urge to share with my
-                    larger community. This sparked the idea to start Daily
-                    Culture. As a company, we strive to make our community
-                    healthier using the best ingredients we can find. From cold
-                    pressed juices, to organic fruits and herbs. No detail is
-                    too small to create a drink to satisfy the soul. What you
-                    drink matters!
+                    would be a part of my diet for the rest of my life.
+                  </Typography>
+                  <Typography>
+                    As I drank more and more I decided to do some brewing of my
+                    own. What I found was a passion to create and share. As I
+                    shared more with family and friends I also had the urge to
+                    share with my larger community. This sparked the idea to
+                    start Daily Culture.
+                  </Typography>
+                  <Typography>
+                    As a company, we strive to make our community healthier
+                    using the best ingredients we can find. From cold pressed
+                    juices, to organic fruits and herbs. No detail is too small
+                    to create a drink to satisfy the soul.
+                    <b> What you drink matters!</b>
                   </Typography>
                 </div>
                 <div className={classes.typo}>
                   <h3>Find us</h3>
                   <Typography>
-                    Follow us anywhere on Instagram for our latest events. You
-                    can find us at the Liberty Farmers market in the Spring!
+                    Follow us on Instagram for our latest events. You can find
+                    us at the Liberty Farmers market in the Spring!
                   </Typography>
                 </div>
 
@@ -73,6 +77,13 @@ export default function About() {
                       Send Us an Email
                     </Typography>
                   </Button>
+                  <div>
+                    <img
+                      src='/img/side-table-shot.png'
+                      alt='Booch'
+                      style={{ width: '100%' }}
+                    />
+                  </div>
                 </div>
               </GridContainer>
             </div>

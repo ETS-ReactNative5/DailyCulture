@@ -1,8 +1,10 @@
 import React from 'react';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
 import { Typography } from '@material-ui/core';
+
+// core components
+import EventSetup from 'components/eventSetup';
 
 // @material-ui/icons
 import Email from '@material-ui/icons/Email';
@@ -10,8 +12,6 @@ import Email from '@material-ui/icons/Email';
 // core components
 import GridContainer from 'components/Grid/GridContainer.js';
 import Layout from '../components/layout';
-import Footer from 'components/Footer/Footer.js';
-import HeaderLinks from 'components/Header/HeaderLinks.js';
 import Button from 'components/CustomButtons/Button.js';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
@@ -31,10 +31,6 @@ export default function Contact() {
               </div>
               <GridContainer>
                 <div className={classes.typo}>
-                  <h2>
-                    Book a kombucha bar for your next event or have something
-                    else to tell us.
-                  </h2>
                   <h3>Send us a message on Instagram</h3>
                   <Button
                     href='https://www.instagram.com/daily.culture.kc'
@@ -60,11 +56,10 @@ export default function Contact() {
                       Question and Comments
                     </Typography>
                   </Button>
-                  {/* <Button color='transparent' className={classes.navLink}>
-                  
-                </Button> */}
                 </div>
               </GridContainer>
+              <h2>Book a kombucha bar for your next event!</h2>
+              <EventSetup />
             </div>
           </div>
         </div>
