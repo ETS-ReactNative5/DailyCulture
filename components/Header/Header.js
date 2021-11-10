@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import Hidden from '@material-ui/core/Hidden';
@@ -72,22 +71,6 @@ export default function Header(props) {
             <img src='img/logos/logo_size_custom.jpg' alt='Home' />
           </Button>
         </div>
-        <Tooltip
-          id='instagram-tooltip'
-          title='Follow us on instagram'
-          placement={'top'}
-          classes={{ tooltip: classes.tooltip }}
-          arrow
-        >
-          <Button
-            color='transparent'
-            href='https://www.instagram.com/daily.culture.kc/'
-            target='_blank'
-            className={classes.title}
-          >
-            <i className={classes.socialIcons + ' fab fa-instagram'} />
-          </Button>
-        </Tooltip>
         <Hidden smDown implementation='css'>
           {rightLinks}
         </Hidden>
