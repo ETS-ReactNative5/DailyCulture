@@ -108,6 +108,7 @@ export default function Order() {
 
   const [orderTotal, setOrderTotal] = React.useState(0);
   const [order, setOrder] = React.useState(initialOrder);
+  const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
   const validationSchema = Yup.object({
@@ -143,6 +144,7 @@ export default function Order() {
         address: '',
         total: orderTotal,
       },
+      enableReinitialize: true,
       validationSchema: validationSchema,
       onSubmit: (values) => {
         send(
@@ -168,6 +170,7 @@ export default function Order() {
           .then((response) => {
             setOrder(initialOrder);
             setOrderTotal(0);
+            setSuccessMessage('Thank you for your order!');
             toast.success('Successfully ordered!', {
               position: toast.POSITION.BOTTOM_RIGHT,
             });
@@ -341,11 +344,13 @@ export default function Order() {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
                     variant='contained'
                     fullWidth
                     type='submit'
+                    disabled={!formik.isValid}
                   >
                     Submit
                   </Button>
