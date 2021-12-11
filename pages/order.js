@@ -255,8 +255,12 @@ export default function Order() {
                   return dropDown(flavor);
                 })}
                 <Grid item xs={12}>
-                  <Typography id='total' value={orderTotal}>
-                    Total: ${orderTotal}
+                  <Typography id='shipping'>
+                    {' '}
+                    We will send you an invoice to pay once we fill your order.
+                  </Typography>
+                  <Typography id='total' variant='h5'>
+                    Total: ${orderTotal} + $5 shipping = ${orderTotal + 5}
                   </Typography>
                 </Grid>
                 <Grid item>
