@@ -37,89 +37,76 @@ const useComponentStyles = makeStyles(componentStyles);
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
+export const orderOptions = {
+  blueberryMintSM: {
+    label: 'Blueberry Mint 16 oz ',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  blueberryMintLG: {
+    label: 'Blueberry Mint 32 oz',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+  fallYallSM: {
+    label: "Fall Y'all 16 oz",
+    subLabel: 'Apple + pumpkin spice',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  fallYallLG: {
+    label: "Fall Y'all 32 oz",
+    subLabel: 'Apple + pumpkin spice',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+  lemonGingerSM: {
+    label: 'Lemon Ginger 16 oz',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  lemonGingerLG: {
+    label: 'Lemon Ginger 32 oz',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+  strawMerrySM: {
+    label: 'Straw-Merry 16 oz',
+    subLabel: 'Strawberry + Rosmary',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  strawMerryLG: {
+    label: 'Straw-Merry 32 oz',
+    subLabel: 'Strawberry + Rosmary',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+};
+
 export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
 
-  const flavors = [
-    'blueberryMintSM',
-    'blueberryMintLG',
-    'fallYallSM',
-    'fallYallLG',
-    'lemonGingerSM',
-    'lemonGingerLG',
-    'strawMerrySM',
-    'strawMerryLG',
-  ];
+  const flavors = Object.keys(orderOptions);
 
-  const initialOrder = {
-    blueberryMintSM: {
-      label: 'Blueberry Mint 16 oz ',
-      cost: 0,
-      price: 6,
-      quantity: 0,
-    },
-    blueberryMintLG: {
-      label: 'Blueberry Mint 32 oz',
-      cost: 0,
-      price: 10,
-      quantity: 0,
-    },
-    fallYallSM: {
-      label: "Fall Y'all 16 oz",
-      subLabel: 'Apple + pumpkin spice',
-      cost: 0,
-      price: 6,
-      quantity: 0,
-    },
-    fallYallLG: {
-      label: "Fall Y'all 32 oz",
-      subLabel: 'Apple + pumpkin spice',
-      cost: 0,
-      price: 10,
-      quantity: 0,
-    },
-    lemonGingerSM: {
-      label: 'Lemon Ginger 16 oz',
-      cost: 0,
-      price: 6,
-      quantity: 0,
-    },
-    lemonGingerLG: {
-      label: 'Lemon Ginger 32 oz',
-      cost: 0,
-      price: 10,
-      quantity: 0,
-    },
-    strawMerrySM: {
-      label: 'Straw-Merry 16 oz',
-      subLabel: 'Strawberry + Rosmary',
-      cost: 0,
-      price: 6,
-      quantity: 0,
-    },
-    strawMerryLG: {
-      label: 'Straw-Merry 32 oz',
-      subLabel: 'Strawberry + Rosmary',
-      cost: 0,
-      price: 10,
-      quantity: 0,
-    },
-  };
-
-  const [order, setOrder] = React.useState(initialOrder);
   const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
+  const initialFlavorsSchema = flavors.reduce((acc, flavor) => {
+    return { ...acc, [flavor]: Yup.string() };
+  }, {});
+
   const validationSchema = Yup.object({
-    blueberryMintSM: Yup.string(),
-    blueberryMintLG: Yup.string(),
-    fallYallSM: Yup.string(),
-    fallYallLG: Yup.string(),
-    lemonGingerSM: Yup.string(),
-    lemonGingerLG: Yup.string(),
-    strawMerrySM: Yup.string(),
-    strawMerryLG: Yup.string(),
+    ...initialFlavorsSchema,
     email: Yup.string().email('Invalid email address').required('Required'),
     phone: Yup.string(),
     name: Yup.string().required('Required'),
@@ -127,17 +114,14 @@ export default function Order() {
     total: Yup.string(),
   });
 
+  const initialFlavors = flavors.reduce((acc, flavor) => {
+    return { ...acc, [flavor]: '' };
+  }, {});
+
   const OrderForm = () => {
     const formik = useFormik({
       initialValues: {
-        blueberryMintSM: '',
-        blueberryMintLG: '',
-        fallYallSM: '',
-        fallYallLG: '',
-        lemonGingerSM: '',
-        lemonGingerLG: '',
-        strawMerrySM: '',
-        strawMerryLG: '',
+        ...initialFlavors,
         name: '',
         email: '',
         phone: '',
@@ -148,11 +132,16 @@ export default function Order() {
       validationSchema: validationSchema,
       onSubmit: (values) => {
         const orderTotal = Object.keys(values).reduce((acc, item) => {
-          if (!order[item]) {
+          if (!orderOptions[item]) {
             return acc;
           }
-          return acc + order[item].price * (values[item] || 0);
+          return acc + orderOptions[item].price * (values[item] || 0);
         }, 0);
+
+        const flavorValues = flavors.reduce((acc, flavor) => {
+          return { ...acc, [flavor]: values[flavor] || 0 };
+        }, {});
+
         send(
           'service_khybsuh',
           'template_iug13b3',
@@ -161,14 +150,7 @@ export default function Order() {
             name: values.name,
             phone: values.phone,
             email: values.email,
-            blueberryMintSM: values.blueberryMintSM || 0,
-            blueberryMintLG: values.blueberryMintLG || 0,
-            fallYallSM: values.fallYallSM || 0,
-            fallYallLG: values.fallYallLG || 0,
-            lemonGingerSM: values.lemonGingerSM || 0,
-            lemonGingerLG: values.lemonGingerLG || 0,
-            strawMerrySM: values.strawMerrySM || 0,
-            strawMerryLG: values.strawMerryLG || 0,
+            ...flavorValues,
             total: orderTotal,
           },
           'user_S1s9CZ9xV8Lt9QB3D5WOH'
@@ -193,16 +175,16 @@ export default function Order() {
           xs={12}
           md={6}
           style={{ display: 'inline-flex', alignItems: 'center' }}
+          key={name}
         >
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
-              {order[name]?.label}
+              {orderOptions[name]?.label}
             </InputLabel>
             <NativeSelect
               value={formik.values[name]}
               id={name}
               name={name}
-              size={4}
               inputProps={{
                 name: name,
                 id: 'uncontrolled-native',
@@ -217,7 +199,7 @@ export default function Order() {
               <option value={3}>3</option>
               <option value={4}>4</option>
             </NativeSelect>
-            <FormHelperText>{order[name]?.subLabel}</FormHelperText>
+            <FormHelperText>{orderOptions[name]?.subLabel}</FormHelperText>
           </FormControl>
           <DeleteForeverIcon
             variant='outlined'
@@ -231,10 +213,10 @@ export default function Order() {
     };
 
     const total = Object.keys(formik.values).reduce((acc, item) => {
-      if (!order[item]) {
+      if (!orderOptions[item]) {
         return acc;
       }
-      return acc + order[item].price * (formik.values[item] || 0);
+      return acc + orderOptions[item].price * (formik.values[item] || 0);
     }, 0);
 
     return (
@@ -244,7 +226,7 @@ export default function Order() {
             <FormControl component='fieldset'>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <h2>Order Kombucha</h2>
+                  <h3>Order Kombucha</h3>
                   <h4>$6 - 16 oz bottles</h4>
                   <h4>$10 - 32 oz bottles</h4>
                   <h4>$24 minimum order (before shipping)</h4>
@@ -268,7 +250,7 @@ export default function Order() {
                     Let's get some information for this order!
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} key={'name'}>
                   <TextField
                     required
                     fullWidth
@@ -288,7 +270,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} key={'email'}>
                   <TextField
                     required
                     fullWidth
@@ -308,7 +290,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} key={'phone'}>
                   <TextField
                     fullWidth
                     id='phone'
@@ -327,7 +309,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} key={'address'}>
                   <TextField
                     required
                     fullWidth
@@ -349,7 +331,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} key={'success'}>
                   <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
