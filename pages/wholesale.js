@@ -19,6 +19,7 @@ import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import BusinessIcon from '@mui/icons-material/Business';
 
 // core components
 import Layout from '../components/layout';
@@ -117,6 +118,7 @@ export default function Order() {
     name: Yup.string().required('Required'),
     address: Yup.string().required('Required'),
     taxID: Yup.string().required('Required'),
+    company: Yup.string().required('Required'),
     total: Yup.string(),
   });
 
@@ -137,6 +139,7 @@ export default function Order() {
         address: '',
         taxID: '',
         total: orderTotal,
+        company: '',
       },
       enableReinitialize: true,
       validationSchema: validationSchema,
@@ -164,6 +167,8 @@ export default function Order() {
             strawMerrySM: values.strawMerrySM || 0,
             strawMerryLG: values.strawMerryLG || 0,
             total: orderTotal,
+            taxID: values.taxID,
+            company: values.company,
           },
           'user_S1s9CZ9xV8Lt9QB3D5WOH'
         )
@@ -281,6 +286,28 @@ export default function Order() {
                       endAdornment: (
                         <InputAdornment position='end'>
                           <Favorite className={classes.inputIconsColor} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id='company'
+                    name='company'
+                    label='Company'
+                    value={formik.values.company}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.company && Boolean(formik.errors.company)
+                    }
+                    helperText={formik.touched.company && formik.errors.company}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <BusinessIcon className={classes.inputIconsColor} />
                         </InputAdornment>
                       ),
                     }}
