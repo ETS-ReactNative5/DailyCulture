@@ -99,7 +99,6 @@ export default function Order() {
     },
   };
 
-  const [orderTotal, setOrderTotal] = React.useState(0);
   const [order, setOrder] = React.useState(initialOrder);
   const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
@@ -138,7 +137,7 @@ export default function Order() {
         phone: '',
         address: '',
         taxID: '',
-        total: orderTotal,
+        total: 0,
         company: '',
       },
       enableReinitialize: true,

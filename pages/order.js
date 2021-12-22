@@ -10,6 +10,7 @@ import { TextField, Grid, Typography } from '@material-ui/core';
 import NativeSelect from '@mui/material/NativeSelect';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Phone from '@material-ui/icons/Phone';
 
@@ -31,14 +32,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles(styles);
 const useComponentStyles = makeStyles(componentStyles);
-const infoSection = makeStyles({
-  container: {
-    margin: '200px',
-    paddingTop: '20px',
-    maxWidth: '900px',
-    margin: 'auto',
-  },
-});
 
 // phone regex
 const phoneRegExp =
@@ -47,7 +40,6 @@ const phoneRegExp =
 export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
-  const localClass = infoSection();
 
   const flavors = [
     'blueberryMintSM',
@@ -73,9 +65,16 @@ export default function Order() {
       price: 10,
       quantity: 0,
     },
-    fallYallSM: { label: "Fall Y'all 16 oz", cost: 0, price: 6, quantity: 0 },
+    fallYallSM: {
+      label: "Fall Y'all 16 oz",
+      subLabel: 'Apple + pumpkin spice',
+      cost: 0,
+      price: 6,
+      quantity: 0,
+    },
     fallYallLG: {
       label: "Fall Y'all 32 oz",
+      subLabel: 'Apple + pumpkin spice',
       cost: 0,
       price: 10,
       quantity: 0,
@@ -94,19 +93,20 @@ export default function Order() {
     },
     strawMerrySM: {
       label: 'Straw-Merry 16 oz',
+      subLabel: 'Strawberry + Rosmary',
       cost: 0,
       price: 6,
       quantity: 0,
     },
     strawMerryLG: {
       label: 'Straw-Merry 32 oz',
+      subLabel: 'Strawberry + Rosmary',
       cost: 0,
       price: 10,
       quantity: 0,
     },
   };
 
-  const [orderTotal, setOrderTotal] = React.useState(0);
   const [order, setOrder] = React.useState(initialOrder);
   const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
@@ -142,11 +142,17 @@ export default function Order() {
         email: '',
         phone: '',
         address: '',
-        total: orderTotal,
+        total: 0,
       },
       enableReinitialize: true,
       validationSchema: validationSchema,
       onSubmit: (values) => {
+        const orderTotal = Object.keys(values).reduce((acc, item) => {
+          if (!order[item]) {
+            return acc;
+          }
+          return acc + order[item].price * (values[item] || 0);
+        }, 0);
         send(
           'service_khybsuh',
           'template_iug13b3',
@@ -155,21 +161,19 @@ export default function Order() {
             name: values.name,
             phone: values.phone,
             email: values.email,
-            blueberryMintSM: order.blueberryMintSM.quantity,
-            blueberryMintLG: order.blueberryMintLG.quantity,
-            fallYallSM: order.fallYallSM.quantity,
-            fallYallLG: order.fallYallLG.quantity,
-            lemonGingerSM: order.lemonGingerSM.quantity,
-            lemonGingerLG: order.lemonGingerLG.quantity,
-            strawMerrySM: order.strawMerrySM.quantity,
-            strawMerryLG: order.strawMerryLG.quantity,
+            blueberryMintSM: values.blueberryMintSM || 0,
+            blueberryMintLG: values.blueberryMintLG || 0,
+            fallYallSM: values.fallYallSM || 0,
+            fallYallLG: values.fallYallLG || 0,
+            lemonGingerSM: values.lemonGingerSM || 0,
+            lemonGingerLG: values.lemonGingerLG || 0,
+            strawMerrySM: values.strawMerrySM || 0,
+            strawMerryLG: values.strawMerryLG || 0,
             total: orderTotal,
           },
           'user_S1s9CZ9xV8Lt9QB3D5WOH'
         )
           .then((response) => {
-            setOrder(initialOrder);
-            setOrderTotal(0);
             setSuccessMessage('Thank you for your order!');
             toast.success('Successfully ordered!', {
               position: toast.POSITION.BOTTOM_RIGHT,
@@ -178,21 +182,9 @@ export default function Order() {
           .catch((err) => {
             console.log('FAILED...', err);
           });
+        formik.resetForm();
       },
     });
-
-    const updateTotal = (quantity, name) => {
-      const orderCopy = { ...order };
-      orderCopy[name].cost = orderCopy[name].price * quantity;
-      orderCopy[name].quantity = quantity;
-      setOrder(orderCopy);
-      setOrderTotal(
-        Object.keys(order).reduce((acc, item) => {
-          const newTotal = acc + order[item].cost;
-          return newTotal;
-        }, 0)
-      );
-    };
 
     const dropDown = (name) => {
       return (
@@ -207,40 +199,43 @@ export default function Order() {
               {order[name]?.label}
             </InputLabel>
             <NativeSelect
+              value={formik.values[name]}
               id={name}
+              name={name}
               size={4}
               inputProps={{
                 name: name,
                 id: 'uncontrolled-native',
               }}
-              value={order[name].quantity}
-              // formik.values.name}
-              // onBlur={()=> formik.setFieldValue(name, order[name].quantity)}
-              // order[name].quantity}
-              //{formik.values[name]}
-              // {formik.values.name}
               onChange={(event) => {
-                // formik.handleChange(name)(event);
-                updateTotal(event.target.value, name);
+                formik.handleChange(name)(event);
               }}
             >
-              <option value={0}>0</option>
+              <option aria-label='None' value='' />
               <option value={1}>1</option>
               <option value={2}>2</option>
               <option value={3}>3</option>
               <option value={4}>4</option>
             </NativeSelect>
+            <FormHelperText>{order[name]?.subLabel}</FormHelperText>
           </FormControl>
           <DeleteForeverIcon
             variant='outlined'
             className={classes.buttonIcon}
             onClick={() => {
-              updateTotal(0, name);
+              formik.setFieldValue(name, '', false);
             }}
           />
         </Grid>
       );
     };
+
+    const total = Object.keys(formik.values).reduce((acc, item) => {
+      if (!order[item]) {
+        return acc;
+      }
+      return acc + order[item].price * (formik.values[item] || 0);
+    }, 0);
 
     return (
       <>
@@ -250,27 +245,32 @@ export default function Order() {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <h2>Order Kombucha</h2>
+                  <h4>$6 - 16 oz bottles</h4>
+                  <h4>$10 - 32 oz bottles</h4>
+                  <h4>$24 minimum order (before shipping)</h4>
                 </Grid>
                 {flavors.map((flavor) => {
                   return dropDown(flavor);
                 })}
                 <Grid item xs={12}>
-                  <Typography id='shipping'>
+                  <Typography id='total' variant='h6'>
+                    Total: ${total} + $5 shipping = ${total + 5}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant='body1'>
                     {' '}
                     We will send you an invoice to pay once we fill your order.
                   </Typography>
-                  <Typography id='total' variant='h5'>
-                    Total: ${orderTotal} + $5 shipping = ${orderTotal + 5}
-                  </Typography>
                 </Grid>
                 <Grid item>
-                  <Typography variant='h5'>
-                    Let's get some information for this order! (We do not save
-                    this)
+                  <Typography variant='body1'>
+                    Let's get some information for this order!
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    required
                     fullWidth
                     id='name'
                     name='name'
@@ -290,6 +290,7 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    required
                     fullWidth
                     id='email'
                     name='email'
@@ -328,6 +329,7 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    required
                     fullWidth
                     id='address'
                     name='address'
@@ -354,7 +356,7 @@ export default function Order() {
                     variant='contained'
                     fullWidth
                     type='submit'
-                    disabled={!formik.isValid}
+                    disabled={!formik.isValid || total < 24}
                   >
                     Submit
                   </Button>
