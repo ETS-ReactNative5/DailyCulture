@@ -17,6 +17,7 @@ import Phone from '@material-ui/icons/Phone';
 import Home from '@material-ui/icons/Home';
 import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 // core components
@@ -115,6 +116,7 @@ export default function Order() {
     phone: Yup.string(),
     name: Yup.string().required('Required'),
     address: Yup.string().required('Required'),
+    taxID: Yup.string().required('Required'),
     total: Yup.string(),
   });
 
@@ -133,6 +135,7 @@ export default function Order() {
         email: '',
         phone: '',
         address: '',
+        taxID: '',
         total: orderTotal,
       },
       enableReinitialize: true,
@@ -220,12 +223,12 @@ export default function Order() {
       );
     };
 
-    const total = Object.keys(formik.values).reduce((acc, item) => {
-      if (!order[item]) {
-        return acc;
-      }
-      return acc + order[item].price * (formik.values[item] || 0);
-    }, 0);
+    // const total = Object.keys(formik.values).reduce((acc, item) => {
+    //   if (!order[item]) {
+    //     return acc;
+    //   }
+    //   return acc + order[item].price * (formik.values[item] || 0);
+    // }, 0);
 
     return (
       <>
@@ -236,17 +239,28 @@ export default function Order() {
                 <Grid item xs={12}>
                   <h2>Wholesale Order Kombucha</h2>
                 </Grid>
+                <Grid item xs={12}>
+                  <h3>Contact us with questions regarding pricing.</h3>
+                  <Button
+                    variant='contained'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    <Email className={classes.icons} />
+                    <Typography
+                      variant='button'
+                      style={{ fontSize: '0.69rem' }}
+                    >
+                      Email us dailyculturekc@gmail.com
+                    </Typography>
+                  </Button>
+                  <h4> Give us a call: 816-419-2158</h4>
+                  <h4>We will send you an invoice when the order is filled.</h4>
+                </Grid>
                 {flavors.map((flavor) => {
                   return dropDown(flavor);
                 })}
-                <Grid item xs={12}>
-                  <Typography>
-                    We will send you an invoice to pay once we fill your order.
-                  </Typography>
-                  <Typography id='total' variant='h5'>
-                    Total: ${total}
-                  </Typography>
-                </Grid>
+
                 <Grid item>
                   <Typography variant='h5'>
                     Let's get some information for this order!
@@ -254,6 +268,7 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    required
                     fullWidth
                     id='name'
                     name='name'
@@ -273,6 +288,7 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    required
                     fullWidth
                     id='email'
                     name='email'
@@ -311,6 +327,7 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    required
                     fullWidth
                     id='address'
                     name='address'
@@ -325,6 +342,26 @@ export default function Order() {
                       endAdornment: (
                         <InputAdornment position='end'>
                           <Home className={classes.inputIconsColor} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id='taxID'
+                    name='taxID'
+                    label='Tax ID Number or Federal ID Number...'
+                    value={formik.values.taxID}
+                    onChange={formik.handleChange}
+                    error={formik.touched.taxID && Boolean(formik.errors.taxID)}
+                    helperText={formik.touched.taxID && formik.errors.taxID}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <ReceiptIcon className={classes.inputIconsColor} />
                         </InputAdornment>
                       ),
                     }}
