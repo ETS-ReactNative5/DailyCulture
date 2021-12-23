@@ -10,8 +10,9 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
-import Tooltip from '@material-ui/core/Tooltip';
 import ListItem from '@material-ui/core/ListItem';
 import Face from '@material-ui/icons/Face';
 import Email from '@material-ui/icons/Email';
@@ -30,32 +31,64 @@ const useStyles = makeStyles(styles);
 export default function HeaderLinks(props) {
   const classes = useStyles();
   const router = useRouter();
-  const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  const handleClick = () => {
-    setOpen(!open);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
     <List className={classes.list}>
       <ListItem className={classes.listItem}>
-        <Tooltip
-          id='instagram-tooltip'
-          title='Follow us on Instagram'
-          placement={'top'}
-          classes={{ tooltip: classes.navLink }}
+        <Button
+          color='transparent'
+          href='https://www.instagram.com/daily.culture.kc/'
+          target='_blank'
+          className={classes.navLink}
         >
+          <i className={classes.socialIcons + ' fab fa-instagram'} />
+          Instagram
+        </Button>
+      </ListItem>
+      <ListItem className={classes.listItem} onClick={handleClick}>
+        <Button color='transparent' className={classes.navLink}>
+          <LocalMallTwoToneIcon />
+          Order
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </Button>
+      </ListItem>
+      <Menu
+        id='basic-menu'
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        disableEnforceFocus={true}
+      >
+        <ListItem className={classes.listItem}>
           <Button
+            onClick={() => router.push('/order')}
             color='transparent'
-            href='https://www.instagram.com/daily.culture.kc/'
-            target='_blank'
             className={classes.navLink}
           >
-            <i className={classes.socialIcons + ' fab fa-instagram'} />
-            Instagram
+            <MapsHomeWorkIcon />
+            Home Delivery
           </Button>
-        </Tooltip>
-      </ListItem>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <Button
+            onClick={() => router.push('/wholesale')}
+            color='transparent'
+            className={classes.navLink}
+          >
+            <StoreIcon />
+            Wholesale
+          </Button>
+        </ListItem>
+      </Menu>
       <ListItem className={classes.listItem}>
         <Button
           onClick={() => router.push('/about')}
@@ -66,39 +99,6 @@ export default function HeaderLinks(props) {
           About
         </Button>
       </ListItem>
-      <ListItemButton className={classes.listItem} onClick={handleClick}>
-        <ListItem className={classes.listItem}>
-          <Button color='transparent' className={classes.navLink}>
-            <LocalMallTwoToneIcon />
-            Order
-            {open ? <ExpandLess /> : <ExpandMore />}
-          </Button>
-        </ListItem>
-      </ListItemButton>
-      <Collapse in={open} timeout='auto' unmountOnExit>
-        <List component='div' disablePadding>
-          <ListItem className={classes.listItem}>
-            <Button
-              onClick={() => router.push('/order')}
-              color='transparent'
-              className={classes.navLink}
-            >
-              <MapsHomeWorkIcon />
-              Home Delivery
-            </Button>
-          </ListItem>
-          <ListItem className={classes.listItem}>
-            <Button
-              onClick={() => router.push('/wholesale')}
-              color='transparent'
-              className={classes.navLink}
-            >
-              <StoreIcon />
-              Wholesale
-            </Button>
-          </ListItem>
-        </List>
-      </Collapse>
       <ListItem className={classes.listItem}>
         <Button
           onClick={() => router.push('/contact')}
