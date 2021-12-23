@@ -20,6 +20,7 @@ import Email from '@material-ui/icons/Email';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import BusinessIcon from '@mui/icons-material/Business';
+import IconButton from '@mui/material/IconButton';
 
 // core components
 import Layout from '../components/layout';
@@ -153,13 +154,16 @@ export default function Order() {
               <option value={48}>48</option>
             </NativeSelect>
           </FormControl>
-          <DeleteForeverIcon
-            variant='outlined'
-            className={classes.buttonIcon}
+          <IconButton
+            color='default'
+            aria-label='Remove item'
+            component='span'
             onClick={() => {
               formik.setFieldValue(name, '', false);
             }}
-          />
+          >
+            <DeleteForeverIcon />
+          </IconButton>
         </Grid>
       );
     };

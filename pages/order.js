@@ -19,6 +19,7 @@ import Home from '@material-ui/icons/Home';
 import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import IconButton from '@mui/material/IconButton';
 
 // core components
 import Layout from '../components/layout';
@@ -201,13 +202,16 @@ export default function Order() {
             </NativeSelect>
             <FormHelperText>{orderOptions[name]?.subLabel}</FormHelperText>
           </FormControl>
-          <DeleteForeverIcon
-            variant='outlined'
-            className={classes.buttonIcon}
+          <IconButton
+            color='default'
+            aria-label='Remove item'
+            component='span'
             onClick={() => {
               formik.setFieldValue(name, '', false);
             }}
-          />
+          >
+            <DeleteForeverIcon />
+          </IconButton>
         </Grid>
       );
     };
