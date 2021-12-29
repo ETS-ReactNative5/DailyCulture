@@ -59,7 +59,7 @@ export default function Order() {
     phone: Yup.string(),
     name: Yup.string().required('Required'),
     address: Yup.string().required('Required'),
-    taxID: Yup.string().required('Required'),
+    taxID: Yup.string(),
     company: Yup.string().required('Required'),
     total: Yup.string(),
   });
@@ -200,7 +200,10 @@ export default function Order() {
                     </Typography>
                   </Button>
                   <h4> Call us: 816-419-2158</h4>
-                  <h4>We will send you an invoice when the order is filled.</h4>
+                  <h4>
+                    We will send you an invoice when the order is filled and
+                    ready to be delivered.
+                  </h4>
                 </Grid>
                 {flavors.map((flavor) => {
                   return dropDown(flavor);
@@ -278,7 +281,7 @@ export default function Order() {
                     fullWidth
                     id='phone'
                     name='phone'
-                    label='Phone - if you prefer text messages '
+                    label='Phone - if you prefer text messages (optional)'
                     value={formik.values.phone}
                     onChange={formik.handleChange}
                     error={formik.touched.phone && Boolean(formik.errors.phone)}
@@ -316,11 +319,10 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12} key={'taxID'}>
                   <TextField
-                    required
                     fullWidth
                     id='taxID'
                     name='taxID'
-                    label='Tax ID Number or Federal ID Number...'
+                    label='Tax ID Number or Federal ID Number...(optional)'
                     value={formik.values.taxID}
                     onChange={formik.handleChange}
                     error={formik.touched.taxID && Boolean(formik.errors.taxID)}
