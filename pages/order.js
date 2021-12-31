@@ -97,13 +97,32 @@ export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
 
+  const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+
+  const getCatalog = async () => {
+    const result = await fetch('/api/catalog', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (result.ok) {
+      return result.json();
+    }
+  };
+
+  React.useEffect(async () => {
+    const flavors = await getCatalog();
+    setFlavorCatalog(flavors.catalog);
+  }, []);
+
   const flavors = Object.keys(orderOptions);
 
   const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
-  const initialFlavorsSchema = flavors.reduce((acc, flavor) => {
-    return { ...acc, [flavor]: Yup.string() };
+  const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
+    return { ...acc, [flavor.name]: Yup.string() };
   }, {});
 
   const validationSchema = Yup.object({
@@ -115,8 +134,8 @@ export default function Order() {
     total: Yup.string(),
   });
 
-  const initialFlavors = flavors.reduce((acc, flavor) => {
-    return { ...acc, [flavor]: '' };
+  const initialFlavors = flavorCatalog.reduce((acc, flavor) => {
+    return { ...acc, [flavor.name]: '' };
   }, {});
 
   const OrderForm = () => {
@@ -132,16 +151,10 @@ export default function Order() {
       enableReinitialize: true,
       validationSchema: validationSchema,
       onSubmit: (values) => {
-        const orderTotal = Object.keys(values).reduce((acc, item) => {
-          if (!orderOptions[item]) {
+        const flavorValues = flavorCatalog.reduce((acc, flavor) => {
+          acc.push(`${flavor.name}: ${values[flavor.name] || 0}`);
             return acc;
-          }
-          return acc + orderOptions[item].price * (values[item] || 0);
-        }, 0);
-
-        const flavorValues = flavors.reduce((acc, flavor) => {
-          return { ...acc, [flavor]: values[flavor] || 0 };
-        }, {});
+        }, []);
 
         send(
           'service_khybsuh',
@@ -151,16 +164,16 @@ export default function Order() {
             name: values.name,
             phone: values.phone,
             email: values.email,
-            ...flavorValues,
-            total: orderTotal,
+            order: flavorValues,
+            total,
           },
           'user_S1s9CZ9xV8Lt9QB3D5WOH'
         )
           .then((response) => {
-            setSuccessMessage('Thank you for your order!');
             toast.success('Successfully ordered!', {
-              position: toast.POSITION.BOTTOM_RIGHT,
+              position: toast.POSITION.BOTTOM_CENTER,
             });
+            setSuccessMessage('Thank you for your order!');
           })
           .catch((err) => {
             console.log('FAILED...', err);
@@ -169,7 +182,7 @@ export default function Order() {
       },
     });
 
-    const dropDown = (name) => {
+    const dropDown = (name, description, outOfStock) => {
       return (
         <Grid
           item
@@ -180,12 +193,14 @@ export default function Order() {
         >
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
-              {orderOptions[name]?.label}
+              {outOfStock ? 'SOLD OUT ' : ''}
+              {name}
             </InputLabel>
             <NativeSelect
               value={formik.values[name]}
               id={name}
               name={name}
+              disabled={outOfStock}
               inputProps={{
                 name: name,
                 id: 'uncontrolled-native',
@@ -200,7 +215,7 @@ export default function Order() {
               <option value={3}>3</option>
               <option value={4}>4</option>
             </NativeSelect>
-            <FormHelperText>{orderOptions[name]?.subLabel}</FormHelperText>
+            <FormHelperText>{description}</FormHelperText>
           </FormControl>
           <IconButton
             color='default'
@@ -217,10 +232,16 @@ export default function Order() {
     };
 
     const total = Object.keys(formik.values).reduce((acc, item) => {
-      if (!orderOptions[item]) {
+      const indexOfFlavor = flavorCatalog.indexOf(
+        flavorCatalog.find((flavor) => flavor.name === item)
+      );
+      if (indexOfFlavor < 0) {
         return acc;
       }
-      return acc + orderOptions[item].price * (formik.values[item] || 0);
+      return (
+        acc +
+        (flavorCatalog[indexOfFlavor].price / 100) * (formik.values[item] || 0)
+      );
     }, 0);
 
     return (
@@ -235,8 +256,8 @@ export default function Order() {
                   <h4>$10 - 32 oz bottles</h4>
                   <h4>$24 minimum order (before shipping)</h4>
                 </Grid>
-                {flavors.map((flavor) => {
-                  return dropDown(flavor);
+                {flavorCatalog.map(({ name, description, outOfStock }) => {
+                  return dropDown(name, description, outOfStock);
                 })}
                 <Grid item xs={12}>
                   <Typography id='total' variant='h6'>
@@ -336,6 +357,7 @@ export default function Order() {
                   />
                 </Grid>
                 <Grid item xs={12} key={'success'}>
+                  <ToastContainer />
                   <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
@@ -346,7 +368,6 @@ export default function Order() {
                   >
                     Submit
                   </Button>
-                  <ToastContainer />
                 </Grid>
               </Grid>
             </FormControl>

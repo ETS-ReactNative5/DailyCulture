@@ -31,7 +31,6 @@ import Button from 'components/CustomButtons/Button.js';
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
 import 'react-toastify/dist/ReactToastify.css';
-import { orderOptions } from './order';
 
 const useStyles = makeStyles(styles);
 const useComponentStyles = makeStyles(componentStyles);
@@ -39,6 +38,61 @@ const useComponentStyles = makeStyles(componentStyles);
 // phone regex
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
+const orderOptions = {
+  blueberryMintSM: {
+    label: 'Blueberry Mint 16 oz ',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  blueberryMintLG: {
+    label: 'Blueberry Mint 32 oz',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+  fallYallSM: {
+    label: "Fall Y'all 16 oz",
+    subLabel: 'Apple + pumpkin spice',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  fallYallLG: {
+    label: "Fall Y'all 32 oz",
+    subLabel: 'Apple + pumpkin spice',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+  lemonGingerSM: {
+    label: 'Lemon Ginger 16 oz',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  lemonGingerLG: {
+    label: 'Lemon Ginger 32 oz',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+  strawMerrySM: {
+    label: 'Straw-Merry 16 oz',
+    subLabel: 'Strawberry + Rosmary',
+    cost: 0,
+    price: 6,
+    quantity: 0,
+  },
+  strawMerryLG: {
+    label: 'Straw-Merry 32 oz',
+    subLabel: 'Strawberry + Rosmary',
+    cost: 0,
+    price: 10,
+    quantity: 0,
+  },
+};
 
 export default function Order() {
   const classes = useStyles();
