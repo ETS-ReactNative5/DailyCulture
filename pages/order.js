@@ -152,7 +152,7 @@ export default function Order() {
       validationSchema: validationSchema,
       onSubmit: (values) => {
         const flavorValues = flavorCatalog.reduce((acc, flavor) => {
-          acc.push(`${flavor.name}: ${values[flavor.name] || 0}`);
+          acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
             return acc;
         }, []);
 
