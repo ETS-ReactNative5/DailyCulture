@@ -209,6 +209,7 @@ export default function Order() {
         order,
         email: values.email,
         phone: values.phone,
+        basePath: window.location.origin,
       });
 
       const paymentResponse = await fetch('/api/checkout', {

@@ -1,4 +1,5 @@
 import { ApiError, Client, Environment } from 'square';
+import { useRouter } from 'next/router';
 import { v4 as uuidv4 } from 'uuid';
 
 // package.json sets NODE_ENV in its scripts
@@ -17,6 +18,8 @@ export default async (req, res) => {
   // Get an instance of the Square API you want call
   const { checkoutApi } = client;
 
+  console.log(req.body);
+
   try {
     const response = await checkoutApi.createCheckout(req.body.locationID, {
       idempotencyKey: uuidv4(),
@@ -31,8 +34,7 @@ export default async (req, res) => {
       merchantSupportEmail: 'dailyculturekc@gmail.com',
       prePopulateBuyerEmail: req.body.email,
       note: `${req.body.phone}`,
-      redirectUrl:
-        'https://daily-culture-8pos1bhyq-chris-boyle.vercel.app/order', // 'http://localhost:3000/order', // 'https:dailyculturekombucha.com/order',
+      redirectUrl: `${req.body.basePath}/order`,
     });
 
     console.log(response);
