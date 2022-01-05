@@ -27,7 +27,7 @@ export default async (req, res) => {
         },
         idempotencyKey: uuidv4(),
       },
-      askForShippingAddress: false,
+      askForShippingAddress: true,
       merchantSupportEmail: 'dailyculturekc@gmail.com',
       prePopulateBuyerEmail: req.body.email,
       // prePopulateShippingAddress: {
