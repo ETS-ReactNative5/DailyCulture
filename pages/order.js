@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-import { send } from 'emailjs-com';
 import { useRouter } from 'next/router';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
@@ -74,7 +73,6 @@ export default function Order() {
     setLocationID(flavors.location.id);
   }, []);
 
-  const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
   const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
@@ -85,12 +83,13 @@ export default function Order() {
     ...initialFlavorsSchema,
     email: Yup.string().email('Invalid email address').required('Required'),
     phone: Yup.string(),
-    name: Yup.string().required('Required'),
-    address: Yup.string().required('Required'),
     total: Yup.string(),
   });
 
   const initialFlavors = flavorCatalog.reduce((acc, flavor) => {
+    if (flavor.name === 'Delivery') {
+      return { ...acc, [flavor.name]: '1' };
+    }
     return { ...acc, [flavor.name]: '' };
   }, {});
 
@@ -98,10 +97,8 @@ export default function Order() {
     const formik = useFormik({
       initialValues: {
         ...initialFlavors,
-        name: '',
         email: '',
         phone: '',
-        address: '',
         total: 0,
       },
       enableReinitialize: true,
@@ -113,31 +110,15 @@ export default function Order() {
           return acc;
         }, []);
 
-        // send email
-        send(
-          'service_khybsuh',
-          'template_iug13b3',
-          {
-            address: values.address,
-            name: values.name,
-            phone: values.phone,
-            email: values.email,
-            order: flavorValues,
-            total,
-          },
-          'user_S1s9CZ9xV8Lt9QB3D5WOH'
-        )
-          .then(async (response) => {
-            const paymentResult = await createPayment(values);
-            router.push(paymentResult.checkoutPageUrl);
-          })
-          .catch((err) => {
-            console.log('FAILED...', err);
-          });
+        const paymentResult = await createPayment(values);
+        router.push(paymentResult.checkoutPageUrl);
       },
     });
 
     const dropDown = (name, description, outOfStock) => {
+      if (name === 'Delivery') {
+        return;
+      }
       return (
         <Grid
           item
@@ -227,6 +208,7 @@ export default function Order() {
         locationID,
         order,
         email: values.email,
+        phone: values.phone,
       });
 
       const paymentResponse = await fetch('/api/checkout', {
@@ -266,46 +248,21 @@ export default function Order() {
                   <h3>Order Kombucha</h3>
                   <h4>$6 - 16 oz bottles</h4>
                   <h4>$10 - 32 oz bottles</h4>
-                  <h4>$24 minimum order (before shipping)</h4>
+                  <h4>$24 minimum order (before delivery)</h4>
                 </Grid>
                 {flavorCatalog.map(({ name, description, outOfStock }) => {
                   return dropDown(name, description, outOfStock);
                 })}
                 <Grid item xs={12}>
                   <Typography id='total' variant='h6'>
-                    Total: ${total} + $5 shipping = ${total + 5}
+                    Total: ${total} + $5 delivery = ${total + 5}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant='body1'>
-                    {' '}
-                    We will send you an invoice to pay once we fill your order.
-                  </Typography>
-                </Grid>
+                <Grid item xs={12}></Grid>
                 <Grid item>
                   <Typography variant='body1'>
                     Let's get some information for this order!
                   </Typography>
-                </Grid>
-                <Grid item xs={12} key={'name'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='name'
-                    name='name'
-                    label='Name'
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Favorite className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
                 </Grid>
                 <Grid item xs={12} key={'email'}>
                   <TextField
@@ -346,30 +303,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'address'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='address'
-                    name='address'
-                    label='Address...'
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.address && Boolean(formik.errors.address)
-                    }
-                    helperText={formik.touched.address && formik.errors.address}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Home className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
                 <Grid item xs={12} key={'success'}>
-                  <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
                     variant='contained'

@@ -30,16 +30,7 @@ export default async (req, res) => {
       askForShippingAddress: true,
       merchantSupportEmail: 'dailyculturekc@gmail.com',
       prePopulateBuyerEmail: req.body.email,
-      // prePopulateShippingAddress: {
-      //   addressLine1: req.body.values.address,
-      //   addressLine2: '',
-      //   locality: '',
-      //   administrativeDistrictLevel1: '',
-      //   postalCode: '',
-      //   country: 'US',
-      //   firstName: req.body.values.firstName,
-      //   lastName: req.body.values.lastName,
-      // },
+      note: `${req.body.phone}`,
       redirectUrl:
         'https://daily-culture-8pos1bhyq-chris-boyle.vercel.app/order', // 'http://localhost:3000/order', // 'https:dailyculturekombucha.com/order',
     });
