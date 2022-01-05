@@ -228,13 +228,21 @@ export default function Order() {
         <form onSubmit={formik.handleSubmit} ref={form}>
           <CardBody>
             <FormControl component='fieldset'>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <h3>Order Kombucha</h3>
+              <Grid item xs={12}>
+                <h3>Order Kombucha</h3>
+              </Grid>
+              <Grid container spacing={1}>
+                <Grid item xs={4}>
                   <h4>$6 - 16 oz bottles</h4>
+                </Grid>
+                <Grid item xs={4}>
                   <h4>$10 - 32 oz bottles</h4>
+                </Grid>
+                <Grid item xs={4}>
                   <h4>$24 minimum order (before shipping)</h4>
                 </Grid>
+              </Grid>
+              <Grid container spacing={3}>
                 {flavors.map((flavor) => {
                   return dropDown(flavor);
                 })}
@@ -243,12 +251,7 @@ export default function Order() {
                     Total: ${total} + $5 shipping = ${total + 5}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant='body1'>
-                    {' '}
-                    We will send you an invoice to pay once we fill your order.
-                  </Typography>
-                </Grid>
+                <Grid item xs={12}></Grid>
                 <Grid item>
                   <Typography variant='body1'>
                     Let's get some information for this order!
