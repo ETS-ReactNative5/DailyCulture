@@ -40,7 +40,8 @@ export default async (req, res) => {
       //   firstName: req.body.values.firstName,
       //   lastName: req.body.values.lastName,
       // },
-      redirectUrl: 'https:dailyculturekombucha.com/order',
+      redirectUrl:
+        'https://daily-culture-8pos1bhyq-chris-boyle.vercel.app/order', // 'http://localhost:3000/order', // 'https:dailyculturekombucha.com/order',
     });
 
     console.log(response);
