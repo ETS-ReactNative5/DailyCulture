@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
-
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import ListItem from '@material-ui/core/ListItem';
 import Face from '@material-ui/icons/Face';
 import Email from '@material-ui/icons/Email';
@@ -47,6 +47,16 @@ export default function HeaderLinks(props) {
         >
           <MapsHomeWorkIcon />
           Home Delivery
+        </Button>
+      </ListItem>
+      <ListItem className={classes.listItem}>
+        <Button
+          onClick={() => router.push('/where')}
+          color='transparent'
+          className={classes.navLink}
+        >
+          <TravelExploreIcon />
+          Where to buy
         </Button>
       </ListItem>
       <ListItem className={classes.listItem}>
