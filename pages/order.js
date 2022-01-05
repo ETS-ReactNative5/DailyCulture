@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { send } from 'emailjs-com';
-import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
@@ -15,6 +14,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Phone from '@material-ui/icons/Phone';
 
 // @material-ui/icons
+import Check from '@material-ui/icons/Check';
 import Home from '@material-ui/icons/Home';
 import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
@@ -22,9 +22,9 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton';
 
 // core components
+import SnackbarContent from 'components/Snackbar/SnackbarContent.js';
 import Layout from '../components/layout';
 import CardBody from '../components/Card/CardBody';
-
 import Button from 'components/CustomButtons/Button.js';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
@@ -41,8 +41,19 @@ const phoneRegExp =
 export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
+  const router = useRouter();
+  const [open, setOpen] = React.useState(false);
+
+  const { transactionId } = router.query;
+
+  React.useEffect(() => {
+    if (transactionId) {
+      setOpen(true);
+    }
+  }, []);
 
   const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+  const [locationID, setLocationID] = React.useState(null);
 
   const getCatalog = async () => {
     const result = await fetch('/api/catalog', {
@@ -59,9 +70,9 @@ export default function Order() {
   React.useEffect(async () => {
     const flavors = await getCatalog();
     setFlavorCatalog(flavors.catalog);
+    setLocationID(flavors.location.id);
   }, []);
 
-  const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
   const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
@@ -72,12 +83,13 @@ export default function Order() {
     ...initialFlavorsSchema,
     email: Yup.string().email('Invalid email address').required('Required'),
     phone: Yup.string(),
-    name: Yup.string().required('Required'),
-    address: Yup.string().required('Required'),
     total: Yup.string(),
   });
 
   const initialFlavors = flavorCatalog.reduce((acc, flavor) => {
+    if (flavor.name === 'Delivery') {
+      return { ...acc, [flavor.name]: '1' };
+    }
     return { ...acc, [flavor.name]: '' };
   }, {});
 
@@ -85,47 +97,28 @@ export default function Order() {
     const formik = useFormik({
       initialValues: {
         ...initialFlavors,
-        name: '',
         email: '',
         phone: '',
-        address: '',
         total: 0,
       },
       enableReinitialize: true,
       validationSchema: validationSchema,
-      onSubmit: (values) => {
+      onSubmit: async (values) => {
+        formik.setSubmitting(true);
         const flavorValues = flavorCatalog.reduce((acc, flavor) => {
           acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
-            return acc;
+          return acc;
         }, []);
 
-        send(
-          'service_khybsuh',
-          'template_iug13b3',
-          {
-            address: values.address,
-            name: values.name,
-            phone: values.phone,
-            email: values.email,
-            order: flavorValues,
-            total,
-          },
-          'user_S1s9CZ9xV8Lt9QB3D5WOH'
-        )
-          .then((response) => {
-            toast.success('Successfully ordered!', {
-              position: toast.POSITION.BOTTOM_CENTER,
-            });
-            setSuccessMessage('Thank you for your order!');
-          })
-          .catch((err) => {
-            console.log('FAILED...', err);
-          });
-        formik.resetForm();
+        const paymentResult = await createPayment(values);
+        router.push(paymentResult.checkoutPageUrl);
       },
     });
 
     const dropDown = (name, description, outOfStock) => {
+      if (name === 'Delivery') {
+        return;
+      }
       return (
         <Grid
           item
@@ -187,8 +180,67 @@ export default function Order() {
       );
     }, 0);
 
+    // Call this function to send a payment token, buyer name, and other details
+    // to the project server code so that a payment can be created with
+    // Payments API
+    const createPayment = async (values) => {
+      const order = flavorCatalog.reduce((acc, flavor) => {
+        if (
+          values[flavor.name] === '' ||
+          values[flavor.name] === 0 ||
+          !values[flavor.name]
+        ) {
+          return acc;
+        }
+
+        return [
+          ...acc,
+          {
+            name: flavor.name,
+            quantity: `${values[flavor.name]}`,
+            basePriceMoney: { amount: parseInt(flavor.price), currency: 'USD' },
+            id: flavor.id,
+          },
+        ];
+      }, []);
+
+      const body = JSON.stringify({
+        locationID,
+        order,
+        email: values.email,
+        phone: values.phone,
+        basePath: window.location.origin,
+      });
+
+      const paymentResponse = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+
+      if (paymentResponse.ok) {
+        return paymentResponse.json();
+      }
+      const errorBody = await paymentResponse.text();
+      throw new Error(errorBody);
+    };
+
     return (
       <>
+        {open && (
+          <SnackbarContent
+            message={
+              <span>
+                <b>KOMBUCHA ORDERED!</b>
+              </span>
+            }
+            close
+            color='success'
+            icon={Check}
+          />
+        )}
         <form onSubmit={formik.handleSubmit} ref={form}>
           <CardBody>
             <FormControl component='fieldset'>
@@ -197,46 +249,21 @@ export default function Order() {
                   <h3>Order Kombucha</h3>
                   <h4>$6 - 16 oz bottles</h4>
                   <h4>$10 - 32 oz bottles</h4>
-                  <h4>$24 minimum order (before shipping)</h4>
+                  <h4>$24 minimum order (before delivery)</h4>
                 </Grid>
                 {flavorCatalog.map(({ name, description, outOfStock }) => {
                   return dropDown(name, description, outOfStock);
                 })}
                 <Grid item xs={12}>
                   <Typography id='total' variant='h6'>
-                    Total: ${total} + $5 shipping = ${total + 5}
+                    Total: ${total} + $5 delivery = ${total + 5}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant='body1'>
-                    {' '}
-                    We will send you an invoice to pay once we fill your order.
-                  </Typography>
-                </Grid>
+                <Grid item xs={12}></Grid>
                 <Grid item>
                   <Typography variant='body1'>
                     Let's get some information for this order!
                   </Typography>
-                </Grid>
-                <Grid item xs={12} key={'name'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='name'
-                    name='name'
-                    label='Name'
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Favorite className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
                 </Grid>
                 <Grid item xs={12} key={'email'}>
                   <TextField
@@ -277,31 +304,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'address'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='address'
-                    name='address'
-                    label='Address...'
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.address && Boolean(formik.errors.address)
-                    }
-                    helperText={formik.touched.address && formik.errors.address}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Home className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
                 <Grid item xs={12} key={'success'}>
-                  <ToastContainer />
-                  <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
                     variant='contained'
@@ -309,7 +312,7 @@ export default function Order() {
                     type='submit'
                     disabled={!formik.isValid || total < 24}
                   >
-                    Submit
+                    Go to Checkout
                   </Button>
                 </Grid>
               </Grid>
