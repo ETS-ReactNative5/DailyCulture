@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import { TextField, Grid, Typography } from '@material-ui/core';
 import NativeSelect from '@mui/material/NativeSelect';
 import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Phone from '@material-ui/icons/Phone';
@@ -31,7 +32,6 @@ import Button from 'components/CustomButtons/Button.js';
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
 import 'react-toastify/dist/ReactToastify.css';
-import { orderOptions } from './order';
 
 const useStyles = makeStyles(styles);
 const useComponentStyles = makeStyles(componentStyles);
@@ -44,13 +44,31 @@ export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
 
-  const flavors = Object.keys(orderOptions);
+  const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+
+  const getCatalog = async () => {
+    const result = await fetch('/api/wholesale-catalog', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (result.ok) {
+      return result.json();
+    }
+  };
+
+  React.useEffect(async () => {
+    const flavors = await getCatalog();
+    setFlavorCatalog(flavors.catalog);
+  }, []);
+
 
   const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
-  const initialFlavorsSchema = flavors.reduce((acc, flavor) => {
-    return { ...acc, [flavor]: Yup.string() };
+  const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
+    return { ...acc, [flavor.name]: Yup.string() };
   }, {});
 
   const validationSchema = Yup.object({
@@ -59,13 +77,13 @@ export default function Order() {
     phone: Yup.string(),
     name: Yup.string().required('Required'),
     address: Yup.string().required('Required'),
-    taxID: Yup.string().required('Required'),
+    taxID: Yup.string(),
     company: Yup.string().required('Required'),
     total: Yup.string(),
   });
 
-  const initialFlavors = flavors.reduce((acc, flavor) => {
-    return { ...acc, [flavor]: '' };
+  const initialFlavors = flavorCatalog.reduce((acc, flavor) => {
+    return { ...acc, [flavor.name]: '' };
   }, {});
 
   const WholesaleOrderForm = () => {
@@ -83,16 +101,10 @@ export default function Order() {
       enableReinitialize: true,
       validationSchema: validationSchema,
       onSubmit: (values) => {
-        const orderTotal = Object.keys(values).reduce((acc, item) => {
-          if (!orderOptions[item]) {
-            return acc;
-          }
-          return acc + orderOptions[item].price * (values[item] || 0);
-        }, 0);
-
-        const flavorValues = flavors.reduce((acc, flavor) => {
-          return { ...acc, [flavor]: values[flavor] || 0 };
-        }, {});
+        const flavorValues = flavorCatalog.reduce((acc, flavor) => {
+          acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
+          return acc;
+        }, []);
 
         send(
           'service_khybsuh',
@@ -102,8 +114,8 @@ export default function Order() {
             name: values.name,
             phone: values.phone,
             email: values.email,
-            ...flavorValues,
-            total: orderTotal,
+            order: flavorValues,
+            total,
             taxID: values.taxID,
             company: values.company,
           },
@@ -122,7 +134,7 @@ export default function Order() {
       },
     });
 
-    const dropDown = (name) => {
+    const dropDown = (name, description, outOfStock) => {
       return (
         <Grid
           item
@@ -133,12 +145,14 @@ export default function Order() {
         >
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
-              {orderOptions[name]?.label}
+              {outOfStock ? 'SOLD OUT ' : ''}
+              {name}
             </InputLabel>
             <NativeSelect
               value={formik.values[name]}
               id={name}
               name={name}
+              disabled={outOfStock}
               inputProps={{
                 name: name,
                 id: 'uncontrolled-native',
@@ -153,6 +167,7 @@ export default function Order() {
               <option value={36}>36</option>
               <option value={48}>48</option>
             </NativeSelect>
+            <FormHelperText>{description}</FormHelperText>
           </FormControl>
           <IconButton
             color='default'
@@ -168,12 +183,18 @@ export default function Order() {
       );
     };
 
-    // const total = Object.keys(formik.values).reduce((acc, item) => {
-    //   if (!order[item]) {
-    //     return acc;
-    //   }
-    //   return acc + order[item].price * (formik.values[item] || 0);
-    // }, 0);
+    const total = Object.keys(formik.values).reduce((acc, item) => {
+      const indexOfFlavor = flavorCatalog.indexOf(
+        flavorCatalog.find((flavor) => flavor.name === item)
+      );
+      if (indexOfFlavor < 0) {
+        return acc;
+      }
+      return (
+        acc +
+        (flavorCatalog[indexOfFlavor].price / 100) * (formik.values[item] || 0)
+      );
+    }, 0);
 
     return (
       <>
@@ -200,12 +221,14 @@ export default function Order() {
                     </Typography>
                   </Button>
                   <h4> Call us: 816-419-2158</h4>
-                  <h4>We will send you an invoice when the order is filled.</h4>
+                  <h4>
+                    We will send you an invoice when the order is filled and
+                    ready to be delivered.
+                  </h4>
                 </Grid>
-                {flavors.map((flavor) => {
-                  return dropDown(flavor);
+                {flavorCatalog.map(({ name, description, outOfStock }) => {
+                  return dropDown(name, description, outOfStock);
                 })}
-
                 <Grid item>
                   <Typography variant='body1'>
                     Let's get some information for this order!
@@ -278,7 +301,7 @@ export default function Order() {
                     fullWidth
                     id='phone'
                     name='phone'
-                    label='Phone - if you prefer text messages '
+                    label='Phone - if you prefer text messages (optional)'
                     value={formik.values.phone}
                     onChange={formik.handleChange}
                     error={formik.touched.phone && Boolean(formik.errors.phone)}
@@ -316,11 +339,10 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12} key={'taxID'}>
                   <TextField
-                    required
                     fullWidth
                     id='taxID'
                     name='taxID'
-                    label='Tax ID Number or Federal ID Number...'
+                    label='Tax ID Number or Federal ID Number...(optional)'
                     value={formik.values.taxID}
                     onChange={formik.handleChange}
                     error={formik.touched.taxID && Boolean(formik.errors.taxID)}

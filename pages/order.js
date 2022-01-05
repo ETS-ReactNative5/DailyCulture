@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { send } from 'emailjs-com';
-import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
@@ -15,6 +14,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Phone from '@material-ui/icons/Phone';
 
 // @material-ui/icons
+import Check from '@material-ui/icons/Check';
 import Home from '@material-ui/icons/Home';
 import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
@@ -22,9 +22,9 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton';
 
 // core components
+import SnackbarContent from 'components/Snackbar/SnackbarContent.js';
 import Layout from '../components/layout';
-import CardBody from 'components/Card/CardBody.js';
-
+import CardBody from '../components/Card/CardBody';
 import Button from 'components/CustomButtons/Button.js';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
@@ -38,138 +38,87 @@ const useComponentStyles = makeStyles(componentStyles);
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-export const orderOptions = {
-  blueberryMintSM: {
-    label: 'Blueberry Mint 16 oz ',
-    cost: 0,
-    price: 6,
-    quantity: 0,
-  },
-  blueberryMintLG: {
-    label: 'Blueberry Mint 32 oz',
-    cost: 0,
-    price: 10,
-    quantity: 0,
-  },
-  fallYallSM: {
-    label: "Fall Y'all 16 oz",
-    subLabel: 'Apple + pumpkin spice',
-    cost: 0,
-    price: 6,
-    quantity: 0,
-  },
-  fallYallLG: {
-    label: "Fall Y'all 32 oz",
-    subLabel: 'Apple + pumpkin spice',
-    cost: 0,
-    price: 10,
-    quantity: 0,
-  },
-  lemonGingerSM: {
-    label: 'Lemon Ginger 16 oz',
-    cost: 0,
-    price: 6,
-    quantity: 0,
-  },
-  lemonGingerLG: {
-    label: 'Lemon Ginger 32 oz',
-    cost: 0,
-    price: 10,
-    quantity: 0,
-  },
-  strawMerrySM: {
-    label: 'Straw-Merry 16 oz',
-    subLabel: 'Strawberry + Rosmary',
-    cost: 0,
-    price: 6,
-    quantity: 0,
-  },
-  strawMerryLG: {
-    label: 'Straw-Merry 32 oz',
-    subLabel: 'Strawberry + Rosmary',
-    cost: 0,
-    price: 10,
-    quantity: 0,
-  },
-};
-
 export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
+  const router = useRouter();
+  const [open, setOpen] = React.useState(false);
 
-  const flavors = Object.keys(orderOptions);
+  const { transactionId } = router.query;
 
-  const [successMessage, setSuccessMessage] = React.useState('');
+  React.useEffect(() => {
+    if (transactionId) {
+      setOpen(true);
+    }
+  }, []);
+
+  const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+  const [locationID, setLocationID] = React.useState(null);
+
+  const getCatalog = async () => {
+    const result = await fetch('/api/catalog', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (result.ok) {
+      return result.json();
+    }
+  };
+
+  React.useEffect(async () => {
+    const flavors = await getCatalog();
+    setFlavorCatalog(flavors.catalog);
+    setLocationID(flavors.location.id);
+  }, []);
+
   const form = React.useRef();
 
-  const initialFlavorsSchema = flavors.reduce((acc, flavor) => {
-    return { ...acc, [flavor]: Yup.string() };
+  const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
+    return { ...acc, [flavor.name]: Yup.string() };
   }, {});
 
   const validationSchema = Yup.object({
     ...initialFlavorsSchema,
     email: Yup.string().email('Invalid email address').required('Required'),
     phone: Yup.string(),
-    name: Yup.string().required('Required'),
-    address: Yup.string().required('Required'),
     total: Yup.string(),
   });
 
-  const initialFlavors = flavors.reduce((acc, flavor) => {
-    return { ...acc, [flavor]: '' };
+  const initialFlavors = flavorCatalog.reduce((acc, flavor) => {
+    if (flavor.name === 'Delivery') {
+      return { ...acc, [flavor.name]: '1' };
+    }
+    return { ...acc, [flavor.name]: '' };
   }, {});
 
   const OrderForm = () => {
     const formik = useFormik({
       initialValues: {
         ...initialFlavors,
-        name: '',
         email: '',
         phone: '',
-        address: '',
         total: 0,
       },
       enableReinitialize: true,
       validationSchema: validationSchema,
-      onSubmit: (values) => {
-        const orderTotal = Object.keys(values).reduce((acc, item) => {
-          if (!orderOptions[item]) {
-            return acc;
-          }
-          return acc + orderOptions[item].price * (values[item] || 0);
-        }, 0);
+      onSubmit: async (values) => {
+        formik.setSubmitting(true);
+        const flavorValues = flavorCatalog.reduce((acc, flavor) => {
+          acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
+          return acc;
+        }, []);
 
-        const flavorValues = flavors.reduce((acc, flavor) => {
-          return { ...acc, [flavor]: values[flavor] || 0 };
-        }, {});
-
-        send(
-          'service_khybsuh',
-          'template_iug13b3',
-          {
-            address: values.address,
-            name: values.name,
-            phone: values.phone,
-            email: values.email,
-            ...flavorValues,
-            total: orderTotal,
-          },
-          'user_S1s9CZ9xV8Lt9QB3D5WOH'
-        )
-          .then((response) => {
-            setSuccessMessage('Thank you for your order!');
-            toast.success('Successfully ordered!', {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            });
-          })
-          .catch((err) => {
-            console.log('FAILED...', err);
-          });
-        formik.resetForm();
+        const paymentResult = await createPayment(values);
+        router.push(paymentResult.checkoutPageUrl);
       },
     });
 
-    const dropDown = (name) => {
+    const dropDown = (name, description, outOfStock) => {
+      if (name === 'Delivery') {
+        return;
+      }
       return (
         <Grid
           item
@@ -180,12 +129,14 @@ export default function Order() {
         >
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
-              {orderOptions[name]?.label}
+              {outOfStock ? 'SOLD OUT ' : ''}
+              {name}
             </InputLabel>
             <NativeSelect
               value={formik.values[name]}
               id={name}
               name={name}
+              disabled={outOfStock}
               inputProps={{
                 name: name,
                 id: 'uncontrolled-native',
@@ -200,7 +151,7 @@ export default function Order() {
               <option value={3}>3</option>
               <option value={4}>4</option>
             </NativeSelect>
-            <FormHelperText>{orderOptions[name]?.subLabel}</FormHelperText>
+            <FormHelperText>{description}</FormHelperText>
           </FormControl>
           <IconButton
             color='default'
@@ -217,14 +168,79 @@ export default function Order() {
     };
 
     const total = Object.keys(formik.values).reduce((acc, item) => {
-      if (!orderOptions[item]) {
+      const indexOfFlavor = flavorCatalog.indexOf(
+        flavorCatalog.find((flavor) => flavor.name === item)
+      );
+      if (indexOfFlavor < 0) {
         return acc;
       }
-      return acc + orderOptions[item].price * (formik.values[item] || 0);
+      return (
+        acc +
+        (flavorCatalog[indexOfFlavor].price / 100) * (formik.values[item] || 0)
+      );
     }, 0);
+
+    // Call this function to send a payment token, buyer name, and other details
+    // to the project server code so that a payment can be created with
+    // Payments API
+    const createPayment = async (values) => {
+      const order = flavorCatalog.reduce((acc, flavor) => {
+        if (
+          values[flavor.name] === '' ||
+          values[flavor.name] === 0 ||
+          !values[flavor.name]
+        ) {
+          return acc;
+        }
+
+        return [
+          ...acc,
+          {
+            name: flavor.name,
+            quantity: `${values[flavor.name]}`,
+            basePriceMoney: { amount: parseInt(flavor.price), currency: 'USD' },
+            id: flavor.id,
+          },
+        ];
+      }, []);
+
+      const body = JSON.stringify({
+        locationID,
+        order,
+        email: values.email,
+        phone: values.phone,
+        basePath: window.location.origin,
+      });
+
+      const paymentResponse = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
+
+      if (paymentResponse.ok) {
+        return paymentResponse.json();
+      }
+      const errorBody = await paymentResponse.text();
+      throw new Error(errorBody);
+    };
 
     return (
       <>
+        {open && (
+          <SnackbarContent
+            message={
+              <span>
+                <b>KOMBUCHA ORDERED!</b>
+              </span>
+            }
+            close
+            color='success'
+            icon={Check}
+          />
+        )}
         <form onSubmit={formik.handleSubmit} ref={form}>
           <CardBody>
             <FormControl component='fieldset'>
@@ -243,12 +259,12 @@ export default function Order() {
                 </Grid>
               </Grid>
               <Grid container spacing={3}>
-                {flavors.map((flavor) => {
-                  return dropDown(flavor);
+                {flavorCatalog.map(({ name, description, outOfStock }) => {
+                  return dropDown(name, description, outOfStock);
                 })}
                 <Grid item xs={12}>
                   <Typography id='total' variant='h6'>
-                    Total: ${total} + $5 shipping = ${total + 5}
+                    Total: ${total} + $5 delivery = ${total + 5}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}></Grid>
@@ -256,26 +272,6 @@ export default function Order() {
                   <Typography variant='body1'>
                     Let's get some information for this order!
                   </Typography>
-                </Grid>
-                <Grid item xs={12} key={'name'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='name'
-                    name='name'
-                    label='Name'
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Favorite className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
                 </Grid>
                 <Grid item xs={12} key={'email'}>
                   <TextField
@@ -316,30 +312,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'address'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='address'
-                    name='address'
-                    label='Address...'
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.address && Boolean(formik.errors.address)
-                    }
-                    helperText={formik.touched.address && formik.errors.address}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Home className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
                 <Grid item xs={12} key={'success'}>
-                  <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
                     variant='contained'
@@ -347,9 +320,8 @@ export default function Order() {
                     type='submit'
                     disabled={!formik.isValid || total < 24}
                   >
-                    Submit
+                    Go to Checkout
                   </Button>
-                  <ToastContainer />
                 </Grid>
               </Grid>
             </FormControl>
