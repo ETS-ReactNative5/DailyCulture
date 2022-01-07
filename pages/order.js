@@ -180,6 +180,17 @@ export default function Order() {
       );
     }, 0);
 
+    const currentOrder = (name, price) => {
+      const quantity = formik.values[name];
+      if (quantity > 0) {
+        return (
+          <Typography variant='body1'>
+            {quantity} - {name} - ${quantity * (price / 100)}
+          </Typography>
+        );
+      }
+    };
+
     // Call this function to send a payment token, buyer name, and other details
     // to the project server code so that a payment can be created with
     // Payments API
@@ -233,7 +244,7 @@ export default function Order() {
           <SnackbarContent
             message={
               <span>
-                <b>KOMBUCHA ORDERED!</b>
+                <b>KOMBUCHA ORDERED! Thanks!</b>
               </span>
             }
             close
@@ -255,7 +266,7 @@ export default function Order() {
                   <h4>$10 - 32 oz bottles</h4>
                 </Grid>
                 <Grid item xs={4}>
-                  <h4>$24 minimum order (before shipping)</h4>
+                  <h4>$24 minimum</h4>
                 </Grid>
               </Grid>
               <Grid container spacing={3}>
@@ -263,8 +274,11 @@ export default function Order() {
                   return dropDown(name, description, outOfStock);
                 })}
                 <Grid item xs={12}>
+                  {flavorCatalog.map(({ name, price }, index) => {
+                    return currentOrder(name, price, index);
+                  })}
                   <Typography id='total' variant='h6'>
-                    Total: ${total} + $5 delivery = ${total + 5}
+                    Total: ${total}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}></Grid>
@@ -318,7 +332,7 @@ export default function Order() {
                     variant='contained'
                     fullWidth
                     type='submit'
-                    disabled={!formik.isValid || total < 24}
+                    disabled={!formik.isValid || total < 29}
                   >
                     Go to Checkout
                   </Button>
