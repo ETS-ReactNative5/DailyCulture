@@ -71,15 +71,14 @@ export default function Where() {
                 <Grid container align='center' spacing={1}>
                   <Grid item xs={12}>
                     <h3>{location.name}</h3>
-                    <Button
-                      onClick={() => openMap(location.GPS)}
-                      color='transparent'
-                      className={classes.navLink}
-                    >
-                      <Typography variant='body1' align='center'>
-                        {location.address}
-                      </Typography>
-                    </Button>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => openMap(location.GPS)}
+                  >
+                    {location.address}
                   </Grid>
                 </Grid>
               );
