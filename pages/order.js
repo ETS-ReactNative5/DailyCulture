@@ -15,8 +15,6 @@ import Phone from '@material-ui/icons/Phone';
 
 // @material-ui/icons
 import Check from '@material-ui/icons/Check';
-import Home from '@material-ui/icons/Home';
-import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton';

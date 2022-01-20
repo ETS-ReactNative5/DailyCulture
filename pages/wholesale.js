@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
 import { send } from 'emailjs-com';
-import { ToastContainer, toast } from 'react-toastify';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
@@ -15,6 +14,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Phone from '@material-ui/icons/Phone';
 
 // @material-ui/icons
+import Check from '@material-ui/icons/Check';
 import Home from '@material-ui/icons/Home';
 import Favorite from '@material-ui/icons/Favorite';
 import Email from '@material-ui/icons/Email';
@@ -24,6 +24,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import IconButton from '@mui/material/IconButton';
 
 // core components
+import SnackbarContent from 'components/Snackbar/SnackbarContent.js';
 import Layout from '../components/layout';
 import CardBody from 'components/Card/CardBody.js';
 
@@ -31,7 +32,6 @@ import Button from 'components/CustomButtons/Button.js';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
-import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles(styles);
 const useComponentStyles = makeStyles(componentStyles);
@@ -45,6 +45,7 @@ export default function Order() {
   const componentClasses = useComponentStyles();
 
   const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
 
   const getCatalog = async () => {
     const result = await fetch('/api/wholesale-catalog', {
@@ -63,8 +64,6 @@ export default function Order() {
     setFlavorCatalog(flavors.catalog);
   }, []);
 
-
-  const [successMessage, setSuccessMessage] = React.useState('');
   const form = React.useRef();
 
   const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
@@ -122,15 +121,17 @@ export default function Order() {
           'user_S1s9CZ9xV8Lt9QB3D5WOH'
         )
           .then((response) => {
-            setSuccessMessage('Thank you for your order!');
-            toast.success('Successfully ordered!', {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            });
+            setOpen(true);
           })
           .catch((err) => {
             console.log('FAILED...', err);
           });
         formik.resetForm();
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'smooth',
+        });
       },
     });
 
@@ -200,6 +201,18 @@ export default function Order() {
       <>
         <form onSubmit={formik.handleSubmit} ref={form}>
           <CardBody>
+            {open && (
+              <SnackbarContent
+                message={
+                  <span>
+                    <b>KOMBUCHA ORDERED! Thanks!</b>
+                  </span>
+                }
+                close
+                color='success'
+                icon={Check}
+              />
+            )}
             <FormControl component='fieldset'>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -240,7 +253,7 @@ export default function Order() {
                     fullWidth
                     id='name'
                     name='name'
-                    label='Name'
+                    label='Contact Name'
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     error={formik.touched.name && Boolean(formik.errors.name)}
@@ -301,7 +314,7 @@ export default function Order() {
                     fullWidth
                     id='phone'
                     name='phone'
-                    label='Phone - if you prefer text messages (optional)'
+                    label='Phone - (optional)'
                     value={formik.values.phone}
                     onChange={formik.handleChange}
                     error={formik.touched.phone && Boolean(formik.errors.phone)}
@@ -342,7 +355,7 @@ export default function Order() {
                     fullWidth
                     id='taxID'
                     name='taxID'
-                    label='Tax ID Number or Federal ID Number...(optional)'
+                    label='Tax ID Number (optional)'
                     value={formik.values.taxID}
                     onChange={formik.handleChange}
                     error={formik.touched.taxID && Boolean(formik.errors.taxID)}
@@ -357,7 +370,6 @@ export default function Order() {
                   />
                 </Grid>
                 <Grid item xs={12} key={'success'}>
-                  <Typography>{successMessage}</Typography>
                   <Button
                     color='twitter'
                     variant='contained'
@@ -367,7 +379,6 @@ export default function Order() {
                   >
                     Submit
                   </Button>
-                  <ToastContainer />
                 </Grid>
               </Grid>
             </FormControl>
