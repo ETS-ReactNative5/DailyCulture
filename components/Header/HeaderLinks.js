@@ -31,7 +31,7 @@ export default function HeaderLinks(props) {
       <ListItem className={classes.listItem}>
         <Button
           color='transparent'
-          href='https://www.instagram.com/daily.culture.kc/'
+          href='https://www.instagram.com/daily.culture.kombucha/'
           target='_blank'
           className={classes.navLink}
         >

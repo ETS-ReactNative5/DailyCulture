@@ -56,8 +56,10 @@ export default function Components(props) {
                 className={localClass.container}
               >
                 We are a Kansas City based company specializing in small batch
-                organic kombucha. Our kombucha is alive and full of healthy
-                probiotics to help keep your gut in check.
+                organic kombucha. Daily Culture was born out of an effort to
+                provide a healthier, tastier drink option for our community! Our
+                kombucha is alive and full of healthy probiotics to help keep
+                your gut in check.
               </Typography>
             </div>
           </GridContainer>

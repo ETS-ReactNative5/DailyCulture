@@ -33,7 +33,7 @@ export default function Contact() {
                 <div className={classes.typo}>
                   <h3>Send us a message on Instagram</h3>
                   <Button
-                    href='https://www.instagram.com/daily.culture.kc'
+                    href='https://www.instagram.com/daily.culture.kombucha'
                     target='_blank'
                   >
                     <i className={classes.socialIcons + ' fab fa-instagram'} />

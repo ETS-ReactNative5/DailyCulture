@@ -24,7 +24,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import IconButton from '@mui/material/IconButton';
 
 // core components
-import SnackbarContent from 'components/Snackbar/SnackbarContent.js';
+import SnackbarContent from '../components/Snackbar/SnackbarContent';
 import Layout from '../components/layout';
 import CardBody from 'components/Card/CardBody.js';
 
@@ -45,7 +45,8 @@ export default function Order() {
   const componentClasses = useComponentStyles();
 
   const [flavorCatalog, setFlavorCatalog] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
+  const [successOpen, setSuccessOpen] = React.useState(false);
+  const [loadingOpen, setLoadingOpen] = React.useState(false);
 
   const getCatalog = async () => {
     const result = await fetch('/api/wholesale-catalog', {
@@ -104,7 +105,7 @@ export default function Order() {
           acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
           return acc;
         }, []);
-
+        setLoadingOpen(true);
         send(
           'service_khybsuh',
           'template_9dizoqc',
@@ -121,12 +122,14 @@ export default function Order() {
           'user_S1s9CZ9xV8Lt9QB3D5WOH'
         )
           .then((response) => {
-            setOpen(true);
+            formik.resetForm();
+            setLoadingOpen(false);
+            setSuccessOpen(true);
           })
           .catch((err) => {
             console.log('FAILED...', err);
+            setLoadingOpen(false);
           });
-        formik.resetForm();
         window.scroll({
           top: 0,
           left: 0,
@@ -201,7 +204,7 @@ export default function Order() {
       <>
         <form onSubmit={formik.handleSubmit} ref={form}>
           <CardBody>
-            {open && (
+            {successOpen && (
               <SnackbarContent
                 message={
                   <span>
@@ -210,6 +213,18 @@ export default function Order() {
                 }
                 close
                 color='success'
+                icon={Check}
+              />
+            )}
+            {loadingOpen && (
+              <SnackbarContent
+                message={
+                  <span>
+                    <b>Counting bubbles... Hang in there!</b>
+                  </span>
+                }
+                close
+                color='info'
                 icon={Check}
               />
             )}

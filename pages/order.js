@@ -27,7 +27,6 @@ import Button from 'components/CustomButtons/Button.js';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
-import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles(styles);
 const useComponentStyles = makeStyles(componentStyles);
