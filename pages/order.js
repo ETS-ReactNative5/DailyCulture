@@ -323,7 +323,7 @@ export default function Order() {
                     Let's get some information for this order!
                   </Typography>
                 </Grid>
-                <Grid item xs={12} key={'email'}>
+                <Grid item xs={12} md={6} key={'email'}>
                   <TextField
                     required
                     fullWidth
@@ -343,7 +343,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'phone'}>
+                <Grid item xs={12} md={6} key={'phone'}>
                   <TextField
                     fullWidth
                     id='phone'
