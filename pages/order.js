@@ -271,17 +271,19 @@ export default function Order() {
               </Grid>
               <Grid container spacing={1}>
                 <Grid item xs={4}>
-                  <Typography variant='subtitle2'>
+                  <Typography variant='subtitle2' align='center'>
                     $6 - 16 oz bottles
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant='subtitle2'>
+                  <Typography variant='subtitle2' align='center'>
                     $10 - 32 oz bottles
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant='subtitle2'>$24 minimum</Typography>
+                  <Typography variant='subtitle2' align='center'>
+                    $24 minimum
+                  </Typography>
                 </Grid>
               </Grid>
               <Grid container spacing={3}>
