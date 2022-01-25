@@ -67,7 +67,10 @@ export default function Order() {
 
   React.useEffect(async () => {
     const flavors = await getCatalog();
-    setFlavorCatalog(flavors.catalog.sort());
+    const sortedFlavors = flavors.catalog.sort((a, b) =>
+      a.name > b.name ? 1 : -1
+    );
+    setFlavorCatalog(sortedFlavors);
     setLocationID(flavors.location.id);
   }, []);
 
