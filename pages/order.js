@@ -11,9 +11,10 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Phone from '@material-ui/icons/Phone';
+import Divider from '@material-ui/core/Divider';
 
 // @material-ui/icons
+import Phone from '@material-ui/icons/Phone';
 import Check from '@material-ui/icons/Check';
 import Email from '@material-ui/icons/Email';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -23,7 +24,7 @@ import IconButton from '@mui/material/IconButton';
 import SnackbarContent from 'components/Snackbar/SnackbarContent.js';
 import Layout from '../components/layout';
 import CardBody from '../components/Card/CardBody';
-import Button from 'components/CustomButtons/Button.js';
+import Button from '../components/CustomButtons/Button';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
@@ -66,7 +67,7 @@ export default function Order() {
 
   React.useEffect(async () => {
     const flavors = await getCatalog();
-    setFlavorCatalog(flavors.catalog);
+    setFlavorCatalog(flavors.catalog.sort());
     setLocationID(flavors.location.id);
   }, []);
 
@@ -126,8 +127,7 @@ export default function Order() {
         >
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
-              {outOfStock ? 'SOLD OUT ' : ''}
-              {name}
+              {outOfStock ? 'SOLD OUT ' : name}
             </InputLabel>
             <NativeSelect
               value={formik.values[name]}
@@ -177,11 +177,13 @@ export default function Order() {
       );
     }, 0);
 
+    const isOrderMinMet = total < 29;
+
     const currentOrder = (name, price) => {
       const quantity = formik.values[name];
       if (quantity > 0) {
         return (
-          <Typography variant='body1'>
+          <Typography variant='body2'>
             {quantity} - {name} - ${quantity * (price / 100)}
           </Typography>
         );
@@ -253,34 +255,66 @@ export default function Order() {
           <CardBody>
             <FormControl component='fieldset'>
               <Grid item xs={12}>
-                <h3>Order Kombucha</h3>
+                <Typography
+                  variant='h4'
+                  align='center'
+                  style={{
+                    margin: '30px 0',
+                    color: '#55acee',
+                  }}
+                >
+                  Order Kombucha
+                </Typography>
               </Grid>
               <Grid container spacing={1}>
                 <Grid item xs={4}>
-                  <h4>$6 - 16 oz bottles</h4>
+                  <Typography variant='subtitle2'>
+                    $6 - 16 oz bottles
+                  </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <h4>$10 - 32 oz bottles</h4>
+                  <Typography variant='subtitle2'>
+                    $10 - 32 oz bottles
+                  </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <h4>$24 minimum</h4>
+                  <Typography variant='subtitle2'>$24 minimum</Typography>
                 </Grid>
               </Grid>
               <Grid container spacing={3}>
                 {flavorCatalog.map(({ name, description, outOfStock }) => {
                   return dropDown(name, description, outOfStock);
                 })}
+              </Grid>
+              <Divider
+                variant='root'
+                style={{
+                  backgroundColor: '#55acee',
+                  height: '2px',
+                  margin: '30px 0',
+                }}
+              />
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
                   {flavorCatalog.map(({ name, price }, index) => {
                     return currentOrder(name, price, index);
                   })}
-                  <Typography id='total' variant='h6'>
+                  <Typography id='total' variant='h7'>
                     Total: ${total}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}></Grid>
-                <Grid item>
-                  <Typography variant='body1'>
+              </Grid>
+              <Divider
+                variant='root'
+                style={{
+                  backgroundColor: '#55acee',
+                  height: '2px',
+                  margin: '30px 0',
+                }}
+              />
+              <Grid container spacing={3}>
+                <Grid item xs={12} key={'info'}>
+                  <Typography variant='body1' align='center'>
                     Let's get some information for this order!
                   </Typography>
                 </Grid>
@@ -324,12 +358,16 @@ export default function Order() {
                   />
                 </Grid>
                 <Grid item xs={12} key={'success'}>
+                  <FormHelperText error>
+                    {isOrderMinMet ? '$24 minimum (Add more booch!)' : ''}
+                  </FormHelperText>
+
                   <Button
                     color='twitter'
                     variant='contained'
                     fullWidth
                     type='submit'
-                    disabled={!formik.isValid || total < 29}
+                    disabled={!formik.isValid || isOrderMinMet}
                   >
                     Go to Checkout
                   </Button>
