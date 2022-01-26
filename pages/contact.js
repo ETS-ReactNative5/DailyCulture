@@ -53,7 +53,7 @@ export default function Contact() {
                       variant='button'
                       style={{ fontSize: '0.69rem' }}
                     >
-                      Question and Comments
+                      Questions and Comments
                     </Typography>
                   </Button>
                 </div>

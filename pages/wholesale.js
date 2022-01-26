@@ -166,10 +166,11 @@ export default function Order() {
               }}
             >
               <option aria-label='None' value='' />
-              <option value={12}>12</option>
-              <option value={24}>24</option>
-              <option value={36}>36</option>
-              <option value={48}>48</option>
+              <option value={12}>12 - 16 oz bottles</option>
+              <option value={24}>24 - 16 oz bottles</option>
+              <option value={36}>36 - 16 oz bottles</option>
+              <option value={48}>48 - 16 oz bottles</option>
+              <option value='5 - gallon keg'>5 gallon keg</option>
             </NativeSelect>
             <FormHelperText>{description}</FormHelperText>
           </FormControl>
@@ -231,14 +232,29 @@ export default function Order() {
             <FormControl component='fieldset'>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <h3>Wholesale Order Kombucha</h3>
+                  <Typography
+                    variant='h4'
+                    align='center'
+                    style={{
+                      margin: '30px 0',
+                      color: '#55acee',
+                    }}
+                  >
+                    Wholesale Order Kombucha
+                  </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <h4>Contact us with questions regarding pricing.</h4>
+                  <Typography variant='body1' align='center'>
+                    Contact us with questions regarding pricing.
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={6} align='center'>
                   <Button
+                    color='twitter'
                     variant='contained'
                     target='_blank'
                     rel='noopener noreferrer'
+                    href={`mailto:dailyculturekc@gmail.com`}
                   >
                     <Email className={classes.icons} />
                     <Typography
@@ -248,21 +264,39 @@ export default function Order() {
                       Email us dailyculturekc@gmail.com
                     </Typography>
                   </Button>
-                  <h4> Call us: 816-419-2158</h4>
-                  <h4>
+                </Grid>
+                <Grid item xs={12} md={6} align='center'>
+                  <Button
+                    color='twitter'
+                    variant='contained'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    href='tel: 816-419-2158'
+                  >
+                    <Phone className={classes.icons} />
+                    <Typography
+                      variant='button'
+                      style={{ fontSize: '0.69rem' }}
+                    >
+                      Call us 816-419-2158
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant='body1' align='center'>
                     We will send you an invoice when the order is filled and
                     ready to be delivered.
-                  </h4>
+                  </Typography>
                 </Grid>
                 {flavorCatalog.map(({ name, description, outOfStock }) => {
                   return dropDown(name, description, outOfStock);
                 })}
-                <Grid item>
-                  <Typography variant='body1'>
-                    Let's get some information for this order!
+                <Grid item item xs={12}>
+                  <Typography variant='subtitle1' align='center'>
+                    Let's get some information for this order
                   </Typography>
                 </Grid>
-                <Grid item xs={12} key={'name'}>
+                <Grid item xs={12} md={4} key={'name'}>
                   <TextField
                     required
                     fullWidth
@@ -282,7 +316,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'company'}>
+                <Grid item xs={12} md={4} key={'company'}>
                   <TextField
                     required
                     fullWidth
@@ -304,7 +338,7 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'email'}>
+                <Grid item xs={12} md={4} key={'email'}>
                   <TextField
                     required
                     fullWidth
@@ -324,7 +358,29 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'phone'}>
+                <Grid item xs={12} md={4} key={'address'}>
+                  <TextField
+                    required
+                    fullWidth
+                    id='address'
+                    name='address'
+                    label='Address'
+                    value={formik.values.address}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.address && Boolean(formik.errors.address)
+                    }
+                    helperText={formik.touched.address && formik.errors.address}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Home className={classes.inputIconsColor} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4} key={'phone'}>
                   <TextField
                     fullWidth
                     id='phone'
@@ -343,29 +399,8 @@ export default function Order() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} key={'address'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='address'
-                    name='address'
-                    label='Address...'
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.address && Boolean(formik.errors.address)
-                    }
-                    helperText={formik.touched.address && formik.errors.address}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Home className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} key={'taxID'}>
+
+                <Grid item xs={12} md={4} key={'taxID'}>
                   <TextField
                     fullWidth
                     id='taxID'
