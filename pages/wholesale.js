@@ -22,6 +22,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import BusinessIcon from '@mui/icons-material/Business';
 import IconButton from '@mui/material/IconButton';
+import Divider from '@material-ui/core/Divider';
 
 // core components
 import SnackbarContent from '../components/Snackbar/SnackbarContent';
@@ -47,6 +48,8 @@ export default function Order() {
   const [flavorCatalog, setFlavorCatalog] = React.useState([]);
   const [successOpen, setSuccessOpen] = React.useState(false);
   const [loadingOpen, setLoadingOpen] = React.useState(false);
+  const [kegFlavors, setKegFlavors] = React.useState([]);
+  const [bottleFlavors, setBottleFlavors] = React.useState([]);
 
   const getCatalog = async () => {
     const result = await fetch('/api/wholesale-catalog', {
@@ -63,6 +66,22 @@ export default function Order() {
   React.useEffect(async () => {
     const flavors = await getCatalog();
     setFlavorCatalog(flavors.catalog);
+    const kegFlavors = flavors.catalog.reduce((acc, flavor) => {
+      if (flavor.name.includes('KEG')) {
+        return [...acc, flavor];
+      }
+      return acc;
+    }, []);
+
+    const bottleFlavors = flavors.catalog.reduce((acc, flavor) => {
+      if (!flavor.name.includes('KEG')) {
+        return [...acc, flavor];
+      }
+      return acc;
+    }, []);
+
+    setKegFlavors(kegFlavors);
+    setBottleFlavors(bottleFlavors);
   }, []);
 
   const form = React.useRef();
@@ -101,8 +120,24 @@ export default function Order() {
       enableReinitialize: true,
       validationSchema: validationSchema,
       onSubmit: (values) => {
+        const WStotal = Object.keys(values).reduce((acc, item) => {
+          const indexOfFlavor = flavorCatalog.indexOf(
+            flavorCatalog.find((flavor) => flavor.name === item)
+          );
+          if (indexOfFlavor < 0) {
+            return acc;
+          }
+          return (
+            acc +
+            (flavorCatalog[indexOfFlavor].price / 100) * (values[item] || 0)
+          );
+        }, 0);
         const flavorValues = flavorCatalog.reduce((acc, flavor) => {
-          acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
+          if (!values[flavor.name]) {
+            return acc;
+          }
+          acc.push(`${values[flavor.name]} - ${flavor.name}`);
+
           return acc;
         }, []);
         setLoadingOpen(true);
@@ -115,7 +150,7 @@ export default function Order() {
             phone: values.phone,
             email: values.email,
             order: flavorValues,
-            total,
+            total: WStotal,
             taxID: values.taxID,
             company: values.company,
           },
@@ -139,15 +174,27 @@ export default function Order() {
     });
 
     const dropDown = (name, description, outOfStock) => {
+      const options = name.includes('KEG') ? (
+        <>
+          <option aria-label='None' value='' />
+          <option value={1}>1 keg</option>
+          <option value={2}>2 kegs</option>
+          <option value={3}>3 kegs</option>
+          <option value={4}>4 kegs</option>
+        </>
+      ) : (
+        <>
+          <option aria-label='None' value='' />
+          <option value={12}>12 - 16 oz bottles</option>
+          <option value={24}>24 - 16 oz bottles</option>
+          <option value={36}>36 - 16 oz bottles</option>
+          <option value={48}>48 - 16 oz bottles</option>
+        </>
+      );
+
       return (
-        <Grid
-          item
-          xs={12}
-          md={6}
-          style={{ display: 'inline-flex', alignItems: 'center' }}
-          key={name}
-        >
-          <FormControl fullWidth sx={{ m: 1 }}>
+        <Grid item xs={12} md={4} key={name}>
+          <FormControl fullWidth>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
               {outOfStock ? 'SOLD OUT ' : ''}
               {name}
@@ -165,12 +212,7 @@ export default function Order() {
                 formik.handleChange(name)(event);
               }}
             >
-              <option aria-label='None' value='' />
-              <option value={12}>12 - 16 oz bottles</option>
-              <option value={24}>24 - 16 oz bottles</option>
-              <option value={36}>36 - 16 oz bottles</option>
-              <option value={48}>48 - 16 oz bottles</option>
-              <option value='5 - gallon keg'>5 gallon keg</option>
+              {options}
             </NativeSelect>
             <FormHelperText>{description}</FormHelperText>
           </FormControl>
@@ -187,19 +229,6 @@ export default function Order() {
         </Grid>
       );
     };
-
-    const total = Object.keys(formik.values).reduce((acc, item) => {
-      const indexOfFlavor = flavorCatalog.indexOf(
-        flavorCatalog.find((flavor) => flavor.name === item)
-      );
-      if (indexOfFlavor < 0) {
-        return acc;
-      }
-      return (
-        acc +
-        (flavorCatalog[indexOfFlavor].price / 100) * (formik.values[item] || 0)
-      );
-    }, 0);
 
     return (
       <>
@@ -248,7 +277,7 @@ export default function Order() {
                     Contact us with questions regarding pricing.
                   </Typography>
                 </Grid>
-                <Grid item xs={12} md={6} align='center'>
+                <Grid item xs={12} md={12} align='center'>
                   <Button
                     color='twitter'
                     variant='contained'
@@ -265,7 +294,7 @@ export default function Order() {
                     </Typography>
                   </Button>
                 </Grid>
-                <Grid item xs={12} md={6} align='center'>
+                <Grid item xs={12} md={12} align='center'>
                   <Button
                     color='twitter'
                     variant='contained'
@@ -288,13 +317,40 @@ export default function Order() {
                     ready to be delivered.
                   </Typography>
                 </Grid>
-                {flavorCatalog.map(({ name, description, outOfStock }) => {
+                <Grid item xs={12}>
+                  <h3 align='center'>BY THE BOTTLE</h3>
+                </Grid>
+                {bottleFlavors?.map(({ name, description, outOfStock }) => {
                   return dropDown(name, description, outOfStock);
                 })}
-                <Grid item item xs={12}>
-                  <Typography variant='subtitle1' align='center'>
+                <Divider
+                  variant='root'
+                  style={{
+                    backgroundColor: '#55acee',
+                    height: '2px',
+                    margin: '30px 0',
+                    width: '100%',
+                  }}
+                />
+                <Grid item xs={12}>
+                  <h3 align='center'>KEGS</h3>
+                </Grid>
+                {kegFlavors?.map(({ name, description, outOfStock }) => {
+                  return dropDown(name, description, outOfStock);
+                })}
+                <Divider
+                  variant='root'
+                  style={{
+                    backgroundColor: '#55acee',
+                    height: '2px',
+                    margin: '30px 0',
+                    width: '100%',
+                  }}
+                />
+                <Grid item xs={12}>
+                  <h3 align='center'>
                     Let's get some information for this order
-                  </Typography>
+                  </h3>
                 </Grid>
                 <Grid item xs={12} md={4} key={'name'}>
                   <TextField
