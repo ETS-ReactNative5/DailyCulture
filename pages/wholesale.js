@@ -30,6 +30,7 @@ import Layout from '../components/layout';
 import CardBody from 'components/Card/CardBody.js';
 
 import Button from 'components/CustomButtons/Button.js';
+import ErrorComponent from '../components/ErrorComponent';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
@@ -50,6 +51,7 @@ export default function Order() {
   const [loadingOpen, setLoadingOpen] = React.useState(false);
   const [kegFlavors, setKegFlavors] = React.useState([]);
   const [bottleFlavors, setBottleFlavors] = React.useState([]);
+  const [error, setError] = React.useState(false);
 
   const getCatalog = async () => {
     const result = await fetch('/api/wholesale-catalog', {
@@ -65,6 +67,10 @@ export default function Order() {
 
   React.useEffect(async () => {
     const flavors = await getCatalog();
+    if (!flavors) {
+      setError(true);
+      return;
+    }
     setFlavorCatalog(flavors.catalog);
     const kegFlavors = flavors.catalog.reduce((acc, flavor) => {
       if (flavor.name.includes('KEG')) {
@@ -317,175 +323,199 @@ export default function Order() {
                     ready to be delivered.
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                  <h3 align='center'>BY THE BOTTLE</h3>
-                </Grid>
-                {bottleFlavors?.map(({ name, description, outOfStock }) => {
-                  return dropDown(name, description, outOfStock);
-                })}
-                <Divider
-                  variant='root'
-                  style={{
-                    backgroundColor: '#55acee',
-                    height: '2px',
-                    margin: '30px 0',
-                    width: '100%',
-                  }}
-                />
-                <Grid item xs={12}>
-                  <h3 align='center'>KEGS</h3>
-                </Grid>
-                {kegFlavors?.map(({ name, description, outOfStock }) => {
-                  return dropDown(name, description, outOfStock);
-                })}
-                <Divider
-                  variant='root'
-                  style={{
-                    backgroundColor: '#55acee',
-                    height: '2px',
-                    margin: '30px 0',
-                    width: '100%',
-                  }}
-                />
-                <Grid item xs={12}>
-                  <h3 align='center'>
-                    Let's get some information for this order
-                  </h3>
-                </Grid>
-                <Grid item xs={12} md={4} key={'name'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='name'
-                    name='name'
-                    label='Contact Name'
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Favorite className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} key={'company'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='company'
-                    name='company'
-                    label='Company'
-                    value={formik.values.company}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.company && Boolean(formik.errors.company)
-                    }
-                    helperText={formik.touched.company && formik.errors.company}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <BusinessIcon className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} key={'email'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='email'
-                    name='email'
-                    label='Email'
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Email className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} key={'address'}>
-                  <TextField
-                    required
-                    fullWidth
-                    id='address'
-                    name='address'
-                    label='Address'
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.address && Boolean(formik.errors.address)
-                    }
-                    helperText={formik.touched.address && formik.errors.address}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Home className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4} key={'phone'}>
-                  <TextField
-                    fullWidth
-                    id='phone'
-                    name='phone'
-                    label='Phone - (optional)'
-                    value={formik.values.phone}
-                    onChange={formik.handleChange}
-                    error={formik.touched.phone && Boolean(formik.errors.phone)}
-                    helperText={formik.touched.phone && formik.errors.phone}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <Phone className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
+                {error ? (
+                  <ErrorComponent />
+                ) : (
+                  <>
+                    <Grid item xs={12}>
+                      <h3 align='center'>BY THE BOTTLE</h3>
+                    </Grid>
+                    {bottleFlavors?.map(({ name, description, outOfStock }) => {
+                      return dropDown(name, description, outOfStock);
+                    })}
+                    <Divider
+                      variant='root'
+                      style={{
+                        backgroundColor: '#55acee',
+                        height: '2px',
+                        margin: '30px 0',
+                        width: '100%',
+                      }}
+                    />
+                    <Grid item xs={12}>
+                      <h3 align='center'>KEGS</h3>
+                    </Grid>
+                    {kegFlavors?.map(({ name, description, outOfStock }) => {
+                      return dropDown(name, description, outOfStock);
+                    })}
+                    <Divider
+                      variant='root'
+                      style={{
+                        backgroundColor: '#55acee',
+                        height: '2px',
+                        margin: '30px 0',
+                        width: '100%',
+                      }}
+                    />
+                    <Grid item xs={12}>
+                      <h3 align='center'>
+                        Let's get some information for this order
+                      </h3>
+                    </Grid>
+                    <Grid item xs={12} md={4} key={'name'}>
+                      <TextField
+                        required
+                        fullWidth
+                        id='name'
+                        name='name'
+                        label='Contact Name'
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.name && Boolean(formik.errors.name)
+                        }
+                        helperText={formik.touched.name && formik.errors.name}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <Favorite className={classes.inputIconsColor} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4} key={'company'}>
+                      <TextField
+                        required
+                        fullWidth
+                        id='company'
+                        name='company'
+                        label='Company'
+                        value={formik.values.company}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.company &&
+                          Boolean(formik.errors.company)
+                        }
+                        helperText={
+                          formik.touched.company && formik.errors.company
+                        }
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <BusinessIcon
+                                className={classes.inputIconsColor}
+                              />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4} key={'email'}>
+                      <TextField
+                        required
+                        fullWidth
+                        id='email'
+                        name='email'
+                        label='Email'
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.email && Boolean(formik.errors.email)
+                        }
+                        helperText={formik.touched.email && formik.errors.email}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <Email className={classes.inputIconsColor} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4} key={'address'}>
+                      <TextField
+                        required
+                        fullWidth
+                        id='address'
+                        name='address'
+                        label='Address'
+                        value={formik.values.address}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.address &&
+                          Boolean(formik.errors.address)
+                        }
+                        helperText={
+                          formik.touched.address && formik.errors.address
+                        }
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <Home className={classes.inputIconsColor} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4} key={'phone'}>
+                      <TextField
+                        fullWidth
+                        id='phone'
+                        name='phone'
+                        label='Phone - (optional)'
+                        value={formik.values.phone}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.phone && Boolean(formik.errors.phone)
+                        }
+                        helperText={formik.touched.phone && formik.errors.phone}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <Phone className={classes.inputIconsColor} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
 
-                <Grid item xs={12} md={4} key={'taxID'}>
-                  <TextField
-                    fullWidth
-                    id='taxID'
-                    name='taxID'
-                    label='Tax ID Number (optional)'
-                    value={formik.values.taxID}
-                    onChange={formik.handleChange}
-                    error={formik.touched.taxID && Boolean(formik.errors.taxID)}
-                    helperText={formik.touched.taxID && formik.errors.taxID}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <ReceiptIcon className={classes.inputIconsColor} />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} key={'success'}>
-                  <Button
-                    color='twitter'
-                    variant='contained'
-                    fullWidth
-                    type='submit'
-                    disabled={!formik.isValid}
-                  >
-                    Submit
-                  </Button>
-                </Grid>
+                    <Grid item xs={12} md={4} key={'taxID'}>
+                      <TextField
+                        fullWidth
+                        id='taxID'
+                        name='taxID'
+                        label='Tax ID Number (optional)'
+                        value={formik.values.taxID}
+                        onChange={formik.handleChange}
+                        error={
+                          formik.touched.taxID && Boolean(formik.errors.taxID)
+                        }
+                        helperText={formik.touched.taxID && formik.errors.taxID}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <ReceiptIcon
+                                className={classes.inputIconsColor}
+                              />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} key={'success'}>
+                      <Button
+                        color='twitter'
+                        variant='contained'
+                        fullWidth
+                        type='submit'
+                        disabled={!formik.isValid}
+                      >
+                        Submit
+                      </Button>
+                    </Grid>
+                  </>
+                )}
               </Grid>
             </FormControl>
           </CardBody>

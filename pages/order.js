@@ -25,6 +25,7 @@ import SnackbarContent from 'components/Snackbar/SnackbarContent.js';
 import Layout from '../components/layout';
 import CardBody from '../components/Card/CardBody';
 import Button from '../components/CustomButtons/Button';
+import ErrorComponent from '../components/ErrorComponent';
 
 import styles from '../styles/jss/nextjs-material-kit/pages/componentsSections/typographyStyle';
 import componentStyles from '../styles/jss/nextjs-material-kit/pages/components';
@@ -41,6 +42,8 @@ export default function Order() {
   const componentClasses = useComponentStyles();
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const [savingOrder, setSavingOrder] = React.useState(false);
+  const [error, setError] = React.useState(false);
 
   const { transactionId } = router.query;
 
@@ -67,6 +70,10 @@ export default function Order() {
 
   React.useEffect(async () => {
     const flavors = await getCatalog();
+    if (!flavors) {
+      setError(true);
+      return;
+    }
     const sortedFlavors = flavors.catalog.sort((a, b) =>
       a.name > b.name ? 1 : -1
     );
@@ -225,6 +232,13 @@ export default function Order() {
         basePath: window.location.origin,
       });
 
+      setSavingOrder(true);
+      window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      });
+
       const paymentResponse = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -232,6 +246,8 @@ export default function Order() {
         },
         body,
       });
+
+      setSavingOrder(false);
 
       if (paymentResponse.ok) {
         return paymentResponse.json();
@@ -251,6 +267,18 @@ export default function Order() {
             }
             close
             color='success'
+            icon={Check}
+          />
+        )}
+        {savingOrder && (
+          <SnackbarContent
+            message={
+              <span>
+                <b>Counting bubbles... Hang in there!</b>
+              </span>
+            }
+            close
+            color='info'
             icon={Check}
           />
         )}
@@ -286,29 +314,35 @@ export default function Order() {
                   </Typography>
                 </Grid>
               </Grid>
-              <Grid container spacing={3}>
-                {flavorCatalog.map(({ name, description, outOfStock }) => {
-                  return dropDown(name, description, outOfStock);
-                })}
-              </Grid>
-              <Divider
-                variant='root'
-                style={{
-                  backgroundColor: '#55acee',
-                  height: '2px',
-                  margin: '30px 0',
-                }}
-              />
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  {flavorCatalog.map(({ name, price }, index) => {
-                    return currentOrder(name, price, index);
-                  })}
-                  <Typography id='total' variant='h7'>
-                    Total: ${total}
-                  </Typography>
-                </Grid>
-              </Grid>
+              {error ? (
+                <ErrorComponent />
+              ) : (
+                <>
+                  <Grid container spacing={3}>
+                    {flavorCatalog.map(({ name, description, outOfStock }) => {
+                      return dropDown(name, description, outOfStock);
+                    })}
+                  </Grid>
+                  <Divider
+                    variant='root'
+                    style={{
+                      backgroundColor: '#55acee',
+                      height: '2px',
+                      margin: '30px 0',
+                    }}
+                  />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      {flavorCatalog.map(({ name, price }, index) => {
+                        return currentOrder(name, price, index);
+                      })}
+                      <Typography id='total' variant='h7'>
+                        Total: ${total}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </>
+              )}
               <Divider
                 variant='root'
                 style={{
