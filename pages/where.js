@@ -28,6 +28,11 @@ export default function Where() {
       GPS: ['38.99949700087589', '-94.59429267478984'],
       address: '409 W Gregory BLVD, Kansas City, MO',
     },
+    {
+      name: 'Billies Grocery',
+      GPS: ['39.068071', '-94.579472'],
+      address: '3216 Gillham Plaza Suite 100, Kansas City, MO 64109',
+    },
   ];
 
   const openMap = (GPS) => {
