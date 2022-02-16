@@ -324,7 +324,7 @@ export default function Order() {
                     })}
                   </Grid>
                   <Divider
-                    variant='root'
+                    variant='fullWidth'
                     style={{
                       backgroundColor: '#55acee',
                       height: '2px',
@@ -344,7 +344,7 @@ export default function Order() {
                 </>
               )}
               <Divider
-                variant='root'
+                variant='fullWidth'
                 style={{
                   backgroundColor: '#55acee',
                   height: '2px',

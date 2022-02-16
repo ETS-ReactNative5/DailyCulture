@@ -1,12 +1,15 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 // nodejs library that concatenates classes
 import classNames from 'classnames';
 // react components for routing our app without refresh
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
+import LiquorIcon from '@mui/icons-material/Liquor';
 // @material-ui/icons
 // core components
+import SnackbarContent from '../components/Snackbar/SnackbarContent';
 import Layout from '../components/layout';
 import GridContainer from 'components/Grid/GridContainer.js';
 import GridItem from 'components/Grid/GridItem.js';
@@ -30,10 +33,18 @@ const infoSection = makeStyles({
 export default function Components(props) {
   const classes = useStyles();
   const localClass = infoSection();
+  const router = useRouter();
   const { ...rest } = props;
   return (
     <div>
       <Layout>
+        <SnackbarContent
+          message='Order Kombucha?'
+          close={undefined}
+          color='info'
+          icon={LiquorIcon}
+          onClick={() => router.push('/order')}
+        />
         <Parallax image='/img/1-bottle-reversed-zoomout.png'>
           <div className={classes.container}>
             <GridContainer>

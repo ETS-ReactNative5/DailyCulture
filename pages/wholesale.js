@@ -38,20 +38,74 @@ import componentStyles from '../styles/jss/nextjs-material-kit/pages/components'
 const useStyles = makeStyles(styles);
 const useComponentStyles = makeStyles(componentStyles);
 
-// phone regex
-const phoneRegExp =
-  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
 export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
 
   const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+  const [locationID, setLocationID] = React.useState(null);
   const [successOpen, setSuccessOpen] = React.useState(false);
   const [loadingOpen, setLoadingOpen] = React.useState(false);
   const [kegFlavors, setKegFlavors] = React.useState([]);
   const [bottleFlavors, setBottleFlavors] = React.useState([]);
   const [error, setError] = React.useState(false);
+  const [invoiceUrl, setInvoiceUrl] = React.useState('');
+
+  const createInvoice = async (values) => {
+    const order = flavorCatalog.reduce((acc, flavor) => {
+      if (
+        values[flavor.name] === '' ||
+        values[flavor.name] === 0 ||
+        !values[flavor.name]
+      ) {
+        return acc;
+      }
+
+      return [
+        ...acc,
+        {
+          quantity: `${values[flavor.name]}`,
+          basePriceMoney: { amount: parseInt(flavor.price), currency: 'USD' },
+          catalogObjectId: flavor.id,
+        },
+      ];
+    }, []);
+
+    const body = JSON.stringify({
+      locationID,
+      order,
+      email: values.email,
+      company: values.company,
+      phone: values.phone,
+      address: values.address,
+      name: values.name,
+    });
+
+    setLoadingOpen(true);
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
+
+    const paymentResponse = await fetch('/api/invoice', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body,
+    });
+
+    setLoadingOpen(false);
+
+    if (paymentResponse.ok) {
+      setSuccessOpen(true);
+      return paymentResponse.json();
+    }
+
+    const errorBody = await paymentResponse.text();
+    throw new Error(errorBody);
+  };
 
   const getCatalog = async () => {
     const result = await fetch('/api/wholesale-catalog', {
@@ -71,6 +125,7 @@ export default function Order() {
       setError(true);
       return;
     }
+    setLocationID(flavors.locationID);
     setFlavorCatalog(flavors.catalog);
     const kegFlavors = flavors.catalog.reduce((acc, flavor) => {
       if (flavor.name.includes('KEG')) {
@@ -125,57 +180,9 @@ export default function Order() {
       },
       enableReinitialize: true,
       validationSchema: validationSchema,
-      onSubmit: (values) => {
-        const WStotal = Object.keys(values).reduce((acc, item) => {
-          const indexOfFlavor = flavorCatalog.indexOf(
-            flavorCatalog.find((flavor) => flavor.name === item)
-          );
-          if (indexOfFlavor < 0) {
-            return acc;
-          }
-          return (
-            acc +
-            (flavorCatalog[indexOfFlavor].price / 100) * (values[item] || 0)
-          );
-        }, 0);
-        const flavorValues = flavorCatalog.reduce((acc, flavor) => {
-          if (!values[flavor.name]) {
-            return acc;
-          }
-          acc.push(`${values[flavor.name]} - ${flavor.name}`);
-
-          return acc;
-        }, []);
-        setLoadingOpen(true);
-        send(
-          'service_khybsuh',
-          'template_9dizoqc',
-          {
-            address: values.address,
-            name: values.name,
-            phone: values.phone,
-            email: values.email,
-            order: flavorValues,
-            total: WStotal,
-            taxID: values.taxID,
-            company: values.company,
-          },
-          'user_S1s9CZ9xV8Lt9QB3D5WOH'
-        )
-          .then((response) => {
-            formik.resetForm();
-            setLoadingOpen(false);
-            setSuccessOpen(true);
-          })
-          .catch((err) => {
-            console.log('FAILED...', err);
-            setLoadingOpen(false);
-          });
-        window.scroll({
-          top: 0,
-          left: 0,
-          behavior: 'smooth',
-        });
+      onSubmit: async (values) => {
+        const paymentResult = await createInvoice(values);
+        setInvoiceUrl(paymentResult.invoiceUrl);
       },
     });
 
@@ -199,7 +206,13 @@ export default function Order() {
       );
 
       return (
-        <Grid item xs={12} md={4} key={name}>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          key={name}
+          style={{ display: 'inline-flex', alignItems: 'center' }}
+        >
           <FormControl fullWidth>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
               {outOfStock ? 'SOLD OUT ' : ''}
@@ -243,10 +256,18 @@ export default function Order() {
             {successOpen && (
               <SnackbarContent
                 message={
-                  <span>
-                    <b>KOMBUCHA ORDERED! Thanks!</b>
-                  </span>
+                  <>
+                    <div align='center'>
+                      <b>
+                        KOMBUCHA ORDERED! An invoice has been emailed to you.
+                      </b>
+                    </div>
+                    <div align='center'>
+                      You can also open your invoice by CLICKING HERE. Thanks!
+                    </div>
+                  </>
                 }
+                onClick={() => window.open(invoiceUrl)}
                 close
                 color='success'
                 icon={Check}
@@ -334,7 +355,7 @@ export default function Order() {
                       return dropDown(name, description, outOfStock);
                     })}
                     <Divider
-                      variant='root'
+                      variant='fullWidth'
                       style={{
                         backgroundColor: '#55acee',
                         height: '2px',
@@ -349,7 +370,7 @@ export default function Order() {
                       return dropDown(name, description, outOfStock);
                     })}
                     <Divider
-                      variant='root'
+                      variant='fullWidth'
                       style={{
                         backgroundColor: '#55acee',
                         height: '2px',
