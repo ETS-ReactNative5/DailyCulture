@@ -86,6 +86,9 @@ const createOrder = async (
 };
 
 const createInvoice = async (order, customer) => {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 7);
+
   try {
     const invoice = await invoicesApi.createInvoice({
       invoice: {
@@ -96,7 +99,7 @@ const createInvoice = async (order, customer) => {
         paymentRequests: [
           {
             requestType: 'BALANCE',
-            dueDate: '2022-02-18',
+            dueDate: dueDate.toISOString().split('T')[0],
             automaticPaymentSource: 'NONE',
             reminders: [
               {

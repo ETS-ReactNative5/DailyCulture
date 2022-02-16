@@ -82,6 +82,8 @@ export default function Order() {
     });
 
     setLoadingOpen(true);
+    setSuccessOpen(false);
+    setInvoiceUrl('');
     window.scroll({
       top: 0,
       left: 0,
