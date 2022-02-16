@@ -37,9 +37,9 @@ export default async (req, res) => {
         return acc;
       }
 
-      const { isDeleted, id, itemData } = object;
+      const { isDeleted, itemData } = object;
       acc.push({
-        id,
+        id: itemData.variations[0].id,
         isDeleted,
         name: itemData.name,
         description: itemData.description,

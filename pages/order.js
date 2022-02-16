@@ -216,10 +216,9 @@ export default function Order() {
         return [
           ...acc,
           {
-            name: flavor.name,
             quantity: `${values[flavor.name]}`,
             basePriceMoney: { amount: parseInt(flavor.price), currency: 'USD' },
-            id: flavor.id,
+            catalogObjectId: flavor.id,
           },
         ];
       }, []);
