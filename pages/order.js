@@ -187,7 +187,7 @@ export default function Order() {
       );
     }, 0);
 
-    const isOrderMinMet = total < 29;
+    const isOrderMinMet = total < 24;
 
     const currentOrder = (name, price) => {
       const quantity = formik.values[name];
