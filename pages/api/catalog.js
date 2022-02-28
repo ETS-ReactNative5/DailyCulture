@@ -38,24 +38,52 @@ export default async (req, res) => {
       }
 
       const { isDeleted, itemData } = object;
-      acc.push({
-        id: itemData.variations[0].id,
-        isDeleted,
-        name: itemData.name,
-        description: itemData.description,
-        price: `${itemData.variations[0].itemVariationData.priceMoney.amount}`,
-        outOfStock: object.itemData.variations[0].absentAtLocationIds
-          ? object.itemData.variations[0].absentAtLocationIds.includes(
-              location.id
-            )
-          : false,
-      });
+
+      const newFlavors = itemData.variations.reduce(
+        (accumulator, variation) => {
+          accumulator.push({
+            id: variation.id,
+            isDeleted,
+            name: `${
+              variation.itemVariationData.name === 'Regular'
+                ? ''
+                : variation.itemVariationData.name
+            } ${itemData.name}`.trim(),
+            description: itemData.description,
+            price: `${variation.itemVariationData.priceMoney.amount}`,
+            outOfStock: variation.absentAtLocationIds
+              ? variation.absentAtLocationIds.includes(location.id)
+              : false,
+            imageIDs: variation.itemVariationData.imageIds,
+          });
+          return accumulator;
+        },
+        []
+      );
+
+      acc.push(...newFlavors);
+
       return acc;
     }, []);
 
+    const flavors = await Promise.all(
+      individualFlavors.map(async (flavor) => {
+        if (flavor.imageIDs) {
+          const image = await catalogApi.retrieveCatalogObject(
+            flavor.imageIDs[0],
+            false
+          );
+
+          const imageUrl = image.result.object.imageData.url;
+          return { ...flavor, imageUrl };
+        }
+        return flavor;
+      })
+    );
+
     return res.status(200).send({
       location,
-      catalog: individualFlavors,
+      catalog: flavors,
     });
   } catch (error) {
     console.log(error);
