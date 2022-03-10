@@ -321,6 +321,7 @@ export default function Order() {
                     ${minOrder} minimum
                   </Typography>
                 </Grid>
+              </Grid>
                   </Typography>
                 </Grid>
               </Grid>
