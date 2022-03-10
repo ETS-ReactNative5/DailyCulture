@@ -322,9 +322,6 @@ export default function Order() {
                   </Typography>
                 </Grid>
               </Grid>
-                  </Typography>
-                </Grid>
-              </Grid>
               {error ? (
                 <ErrorComponent />
               ) : (
