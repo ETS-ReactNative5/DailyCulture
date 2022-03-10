@@ -306,17 +306,19 @@ export default function Order() {
               <Grid container spacing={1}>
                 <Grid item xs={4}>
                   <Typography variant='subtitle2' align='center'>
-                    $6 - 16 oz bottles
+                    $5.75 - 16 oz bottles
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <Typography variant='subtitle2' align='center'>
-                    $10 - 32 oz bottles
+                    $9.75 - 32 oz bottles
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <Typography variant='subtitle2' align='center'>
-                    $24 minimum
+                    $23 minimum
+                  </Typography>
+                </Grid>
                   </Typography>
                 </Grid>
               </Grid>
