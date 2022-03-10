@@ -27,6 +27,16 @@ export default async (req, res) => {
         order: {
           locationId: req.body.locationID,
           lineItems: req.body.order,
+          taxes: [
+            {
+              name: 'Tax',
+              percentage: '8.86',
+              appliedMoney: {
+                amount: req.body.total,
+                currency: 'USD',
+              },
+            },
+          ],
         },
         idempotencyKey: uuidv4(),
       },
@@ -37,7 +47,6 @@ export default async (req, res) => {
       redirectUrl: `${req.body.basePath}/order`,
     });
 
-    console.log(response);
     return res.status(200).send({
       checkoutID: response.result.checkout.id,
       checkoutPageUrl: response.result.checkout.checkoutPageUrl,

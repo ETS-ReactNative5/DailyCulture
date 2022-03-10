@@ -226,6 +226,13 @@ export default function Order() {
       const body = JSON.stringify({
         locationID,
         order,
+        total:
+          total * 100 -
+          flavorCatalog[
+            flavorCatalog.indexOf(
+              flavorCatalog.find((flavor) => flavor.name === 'Delivery')
+            )
+          ].price,
         email: values.email,
         phone: values.phone,
         basePath: window.location.origin,
