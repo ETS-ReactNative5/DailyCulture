@@ -37,6 +37,8 @@ const useComponentStyles = makeStyles(componentStyles);
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
+const minOrder = 23;
+
 export default function Order() {
   const classes = useStyles();
   const componentClasses = useComponentStyles();
@@ -187,7 +189,7 @@ export default function Order() {
       );
     }, 0);
 
-    const isOrderMinMet = total < 24;
+    const isOrderMinMet = total < minOrder;
 
     const currentOrder = (name, price) => {
       const quantity = formik.values[name];
@@ -316,7 +318,7 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={4}>
                   <Typography variant='subtitle2' align='center'>
-                    $23 minimum
+                    ${minOrder} minimum
                   </Typography>
                 </Grid>
                   </Typography>
@@ -406,7 +408,9 @@ export default function Order() {
                 </Grid>
                 <Grid item xs={12} key={'success'}>
                   <FormHelperText error>
-                    {isOrderMinMet ? '$24 minimum (Add more booch!)' : ''}
+                    {isOrderMinMet
+                      ? `$${minOrder} minimum (add more booch!)`
+                      : ''}
                   </FormHelperText>
 
                   <Button
