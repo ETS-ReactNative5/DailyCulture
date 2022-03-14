@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { useFormik } from 'formik';
@@ -125,7 +126,7 @@ export default function Order() {
       },
     });
 
-    const dropDown = (name, description, outOfStock) => {
+    const dropDown = (name, description, outOfStock, imageUrl) => {
       if (name === 'Delivery') {
         return;
       }
@@ -137,6 +138,12 @@ export default function Order() {
           style={{ display: 'inline-flex', alignItems: 'center' }}
           key={name}
         >
+          <Image
+            src={imageUrl ? imageUrl : '/img/Bottles-in-fridge.jpg'}
+            alt='liquid gold'
+            width={75}
+            height={75}
+          />
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
               {outOfStock ? 'SOLD OUT ' : name}
@@ -327,9 +334,16 @@ export default function Order() {
               ) : (
                 <>
                   <Grid container spacing={3}>
-                    {flavorCatalog.map(({ name, description, outOfStock }) => {
-                      return dropDown(name, description, outOfStock);
-                    })}
+                    {flavorCatalog.map(
+                      ({ name, description, outOfStock, imageUrl }) => {
+                        return dropDown(
+                          name,
+                          description,
+                          outOfStock,
+                          imageUrl
+                        );
+                      }
+                    )}
                   </Grid>
                   <Divider
                     variant='fullWidth'
