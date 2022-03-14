@@ -205,7 +205,7 @@ export default function Order() {
       if (quantity > 0) {
         return (
           <Typography variant='body2'>
-            {quantity} - {name} - ${quantity * (price / 100)}
+            {quantity} - {name} - ${(quantity * (price / 100)).toFixed(2)}
           </Typography>
         );
       }
@@ -361,7 +361,7 @@ export default function Order() {
                         return currentOrder(name, price, index);
                       })}
                       <Typography id='total' variant='h7'>
-                        Total: ${total}
+                        Total: ${total.toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>
