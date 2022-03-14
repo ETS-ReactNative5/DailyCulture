@@ -138,12 +138,14 @@ export default function Order() {
           style={{ display: 'inline-flex', alignItems: 'center' }}
           key={name}
         >
+          <div style={{ paddingRight: '10px' }}>
           <Image
             src={imageUrl ? imageUrl : '/img/Bottles-in-fridge.jpg'}
             alt='liquid gold'
             width={75}
             height={75}
           />
+          </div>
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
               {outOfStock ? 'SOLD OUT ' : name}
