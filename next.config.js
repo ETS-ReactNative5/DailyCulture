@@ -11,6 +11,7 @@ module.exports = withPlugins([[withImages]], {
   images: {
     domains: [
       'square-catalog-sandbox.s3.amazonaws.com',
+      'square-catalog-production.s3.amazonaws.com',
       'square-catalog.s3.amazonaws.com',
     ],
   },
