@@ -55,6 +55,7 @@ export default async (req, res) => {
               ? variation.absentAtLocationIds.includes(location.id)
               : false,
             imageIDs: variation.itemVariationData.imageIds || null,
+            variation: variation.itemVariationData,
           });
           return accumulator;
         },
