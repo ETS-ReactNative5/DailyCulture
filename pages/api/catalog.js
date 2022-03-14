@@ -54,7 +54,7 @@ export default async (req, res) => {
             outOfStock: variation.absentAtLocationIds
               ? variation.absentAtLocationIds.includes(location.id)
               : false,
-            imageIDs: variation.itemVariationData.imageIds,
+            imageIDs: variation.itemVariationData.imageIds || null,
           });
           return accumulator;
         },
