@@ -13,6 +13,7 @@ module.exports = withPlugins([[withImages]], {
       'square-catalog-sandbox.s3.amazonaws.com',
       'square-catalog-production.s3.amazonaws.com',
       'square-catalog.s3.amazonaws.com',
+      'items-images-production.s3.us-west-2.amazonaws.com'
     ],
   },
 });
