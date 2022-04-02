@@ -57,7 +57,9 @@ const createOrder = async (
   referenceID,
   order,
   idempotencyKey,
-  customer
+  customer,
+  phone,
+  taxID
 ) => {
   try {
     const response = await ordersApi.createOrder({
@@ -76,6 +78,10 @@ const createOrder = async (
             },
           },
         ],
+        metadata: {
+          phoneNumber: phone || 'not given',
+          taxID: taxID || 'not given',
+        },
       },
       idempotencyKey,
     });
@@ -88,6 +94,10 @@ const createOrder = async (
 const createInvoice = async (order, customer) => {
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + 7);
+
+  const { taxID, phoneNumber } = order.order.metadata;
+
+  const taxIDandPhone = `Phone #: ${phoneNumber}. Tax ID: ${taxID}.`;
 
   try {
     const invoice = await invoicesApi.createInvoice({
@@ -106,12 +116,16 @@ const createInvoice = async (order, customer) => {
                 relativeScheduledDays: -1,
                 message: 'Your invoice is due tomorrow',
               },
+              {
+                relativeScheduledDays: 0,
+                message: 'Your invoice is due today!',
+              },
             ],
           },
         ],
         deliveryMethod: 'EMAIL',
         title: 'Daily Culture Kombucha',
-        description: 'We appreciate your business!',
+        description: `${taxIDandPhone} \n\n Thanks for your oder!  Give us a couple days to get this filled.  We will reach out if order times are longer than usual.  We appreciate your business!`,
         acceptedPaymentMethods: {
           card: true,
           bankAccount: true,
@@ -136,7 +150,8 @@ const createInvoice = async (order, customer) => {
 };
 
 export default async (req, res) => {
-  const { locationID, order, email, company, name, address } = req.body;
+  const { locationID, order, email, company, name, phone, address, taxID } =
+    req.body;
   const idempotencyKey = uuidv4();
   const referenceID = `${company}-${idempotencyKey}`.substring(0, 40);
   try {
@@ -147,7 +162,9 @@ export default async (req, res) => {
       referenceID,
       order,
       idempotencyKey,
-      customer
+      customer,
+      phone,
+      taxID
     );
 
     const result = await createInvoice(squareOrder, customer);

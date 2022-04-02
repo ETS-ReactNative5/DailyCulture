@@ -79,6 +79,7 @@ export default function Order() {
       phone: values.phone,
       address: values.address,
       name: values.name,
+      taxID: values.taxID,
     });
 
     setLoadingOpen(true);
@@ -158,7 +159,7 @@ export default function Order() {
     email: Yup.string().email('Invalid email address').required('Required'),
     phone: Yup.string(),
     name: Yup.string().required('Required'),
-    address: Yup.string().required('Required'),
+    address: Yup.string(),
     taxID: Yup.string(),
     company: Yup.string().required('Required'),
     total: Yup.string(),
@@ -462,7 +463,7 @@ export default function Order() {
                         fullWidth
                         id='address'
                         name='address'
-                        label='Address'
+                        label='Address - (optional)'
                         value={formik.values.address}
                         onChange={formik.handleChange}
                         error={
