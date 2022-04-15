@@ -93,7 +93,7 @@ const createOrder = async (
 
 const createInvoice = async (order, customer) => {
   const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 7);
+  dueDate.setDate(dueDate.getDate() + 14);
 
   const { taxID, phoneNumber } = order.order.metadata;
 
