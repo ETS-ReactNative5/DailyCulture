@@ -122,7 +122,7 @@ export default function Order() {
       },
     });
 
-    const dropDown = (name, description, outOfStock, imageUrl) => {
+    const dropDown = (name, description, outOfStock, imageUrl, price) => {
       if (name === 'Delivery') {
         return;
       }
@@ -165,7 +165,9 @@ export default function Order() {
               <option value={3}>3</option>
               <option value={4}>4</option>
             </NativeSelect>
-            <FormHelperText>{description}</FormHelperText>
+            <FormHelperText>
+              {description} - ${price / 100}
+            </FormHelperText>
           </FormControl>
           <IconButton
             color='default'
@@ -310,35 +312,19 @@ export default function Order() {
                   Order Kombucha
                 </Typography>
               </Grid>
-              <Grid container spacing={1}>
-                <Grid item xs={4}>
-                  <Typography variant='subtitle2' align='center'>
-                    $5.75 - 16 oz bottles
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography variant='subtitle2' align='center'>
-                    $9.75 - 32 oz bottles
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography variant='subtitle2' align='center'>
-                    ${minOrder} minimum
-                  </Typography>
-                </Grid>
-              </Grid>
               {error ? (
                 <ErrorComponent />
               ) : (
                 <>
                   <Grid container spacing={3}>
                     {flavorCatalog.map(
-                      ({ name, description, outOfStock, imageUrl }) => {
+                      ({ name, description, outOfStock, imageUrl, price }) => {
                         return dropDown(
                           name,
                           description,
                           outOfStock,
-                          imageUrl
+                          imageUrl,
+                          price
                         );
                       }
                     )}
