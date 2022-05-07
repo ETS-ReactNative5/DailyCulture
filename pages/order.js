@@ -346,12 +346,19 @@ export default function Order() {
                     }}
                   />
                   <Grid container spacing={3}>
-                    <Grid item xs={12} key={'info'}>
+                    <Grid item xs={12} key={'limited info'}>
                       <Typography variant='h5' align='center'>
                         LIMITED Release
                       </Typography>
                     </Grid>
                     <Grid container spacing={3}>
+                      {!limited.length && (
+                        <Grid item xs={12} key={'no limited info'}>
+                          <Typography variant='body1' align='center'>
+                            No limited release flavors at this time
+                          </Typography>
+                        </Grid>
+                      )}
                       {limited.map(
                         ({
                           name,
@@ -381,12 +388,13 @@ export default function Order() {
                   />
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
-                      {flavors.map(({ name, price }, index) => {
-                        return currentOrder(name, price, index);
-                      })}
                       {limited.map(({ name, price }, index) => {
                         return currentOrder(name, price, index);
                       })}
+                      {flavors.map(({ name, price }, index) => {
+                        return currentOrder(name, price, index);
+                      })}
+
                       <Typography id='total' variant='h7'>
                         Total: ${total.toFixed(2)}
                       </Typography>
