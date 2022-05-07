@@ -28,10 +28,12 @@ export default async (req, res) => {
     const response = await catalogApi.listCatalog();
 
     const individualCategory = response.result.objects.find((object) => {
+      return object.categoryData && object.categoryData.name === 'individual';
+    });
+
+    const limitedCategory = response.result.objects.find((object) => {
       return (
-        object.categoryData &&
-        (object.categoryData.name === 'individual' ||
-          object.categoryData.name === LIMITED_CATEGORY)
+        object.categoryData && object.categoryData.name === LIMITED_CATEGORY
       );
     });
 
@@ -39,7 +41,7 @@ export default async (req, res) => {
       if (!object.itemData) {
         return acc;
       }
-      if (object.itemData.categoryId !== individualCategory.id) {
+      if (![individualCategory.id].includes(object.itemData.categoryId)) {
         return acc;
       }
 
@@ -73,6 +75,59 @@ export default async (req, res) => {
       return acc;
     }, []);
 
+    const limitedFlavors = response.result.objects.reduce((acc, object) => {
+      if (!object.itemData) {
+        return acc;
+      }
+      if (![limitedCategory.id].includes(object.itemData.categoryId)) {
+        return acc;
+      }
+
+      const { isDeleted, itemData } = object;
+
+      const newFlavors = itemData.variations.reduce(
+        (accumulator, variation) => {
+          accumulator.push({
+            id: variation.id,
+            isDeleted,
+            name: `${
+              variation.itemVariationData.name === 'Regular'
+                ? ''
+                : variation.itemVariationData.name
+            } ${itemData.name}`.trim(),
+            description: itemData.description,
+            price: `${variation.itemVariationData.priceMoney.amount}`,
+            outOfStock: variation.absentAtLocationIds
+              ? variation.absentAtLocationIds.includes(location.id)
+              : false,
+            imageIDs: variation.itemVariationData.imageIds || null,
+            limited: individualCategory.categoryData.name === LIMITED_CATEGORY,
+          });
+          return accumulator;
+        },
+        []
+      );
+
+      acc.push(...newFlavors);
+
+      return acc;
+    }, []);
+
+    const limitedReleaseFlavors = await Promise.all(
+      limitedFlavors.map(async (flavor) => {
+        if (flavor.imageIDs) {
+          const image = await catalogApi.retrieveCatalogObject(
+            flavor.imageIDs[0],
+            false
+          );
+
+          const imageUrl = image.result.object.imageData.url;
+          return { ...flavor, imageUrl };
+        }
+        return flavor;
+      })
+    );
+
     const flavors = await Promise.all(
       individualFlavors.map(async (flavor) => {
         if (flavor.imageIDs) {
@@ -91,6 +146,7 @@ export default async (req, res) => {
     return res.status(200).send({
       location,
       catalog: flavors,
+      limited: limitedReleaseFlavors,
     });
   } catch (error) {
     console.log(error);

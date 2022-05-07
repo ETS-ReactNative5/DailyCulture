@@ -56,7 +56,12 @@ export default function Order() {
     }
   }, []);
 
-  const [flavorCatalog, setFlavorCatalog] = React.useState([]);
+  const [flavorCatalog, setFlavorCatalog] = React.useState({
+    flavors: [],
+    limited: [],
+  });
+
+  const { flavors, limited } = flavorCatalog;
   const [locationID, setLocationID] = React.useState(null);
 
   const getCatalog = async () => {
@@ -80,13 +85,17 @@ export default function Order() {
     const sortedFlavors = flavors.catalog.sort((a, b) =>
       a.name > b.name ? 1 : -1
     );
-    setFlavorCatalog(sortedFlavors);
+
+    const sortedLimitedFlavors = flavors.limited.sort((a, b) =>
+      a.name > b.name ? 1 : -1
+    );
+    setFlavorCatalog({ flavors: sortedFlavors, limited: sortedLimitedFlavors });
     setLocationID(flavors.location.id);
   }, []);
 
   const form = React.useRef();
 
-  const initialFlavorsSchema = flavorCatalog.reduce((acc, flavor) => {
+  const initialFlavorsSchema = flavors.reduce((acc, flavor) => {
     return { ...acc, [flavor.name]: Yup.string() };
   }, {});
 
@@ -97,7 +106,7 @@ export default function Order() {
     total: Yup.string(),
   });
 
-  const initialFlavors = flavorCatalog.reduce((acc, flavor) => {
+  const initialFlavors = flavors.reduce((acc, flavor) => {
     if (flavor.name === 'Delivery') {
       return { ...acc, [flavor.name]: '1' };
     }
@@ -184,15 +193,14 @@ export default function Order() {
     };
 
     const total = Object.keys(formik.values).reduce((acc, item) => {
-      const indexOfFlavor = flavorCatalog.indexOf(
-        flavorCatalog.find((flavor) => flavor.name === item)
+      const indexOfFlavor = flavors.indexOf(
+        flavors.find((flavor) => flavor.name === item)
       );
       if (indexOfFlavor < 0) {
         return acc;
       }
       return (
-        acc +
-        (flavorCatalog[indexOfFlavor].price / 100) * (formik.values[item] || 0)
+        acc + (flavors[indexOfFlavor].price / 100) * (formik.values[item] || 0)
       );
     }, 0);
 
@@ -213,7 +221,7 @@ export default function Order() {
     // to the project server code so that a payment can be created with
     // Payments API
     const createPayment = async (values) => {
-      const order = flavorCatalog.reduce((acc, flavor) => {
+      const order = flavorCatalog.flavors.reduce((acc, flavor) => {
         if (
           values[flavor.name] === '' ||
           values[flavor.name] === 0 ||
@@ -237,9 +245,9 @@ export default function Order() {
         order,
         total:
           total * 100 -
-          flavorCatalog[
-            flavorCatalog.indexOf(
-              flavorCatalog.find((flavor) => flavor.name === 'Delivery')
+          flavors[
+            flavors.indexOf(
+              flavors.find((flavor) => flavor.name === 'Delivery')
             )
           ].price,
         email: values.email,
@@ -317,7 +325,7 @@ export default function Order() {
               ) : (
                 <>
                   <Grid container spacing={3}>
-                    {flavorCatalog.map(
+                    {flavors.map(
                       ({ name, description, outOfStock, imageUrl, price }) => {
                         return dropDown(
                           name,
@@ -338,8 +346,45 @@ export default function Order() {
                     }}
                   />
                   <Grid container spacing={3}>
+                    <Grid item xs={12} key={'info'}>
+                      <Typography variant='h5' align='center'>
+                        LIMITED Release
+                      </Typography>
+                    </Grid>
+                    <Grid container spacing={3}>
+                      {limited.map(
+                        ({
+                          name,
+                          description,
+                          outOfStock,
+                          imageUrl,
+                          price,
+                        }) => {
+                          return dropDown(
+                            name,
+                            description,
+                            outOfStock,
+                            imageUrl,
+                            price
+                          );
+                        }
+                      )}
+                    </Grid>
+                  </Grid>
+                  <Divider
+                    variant='fullWidth'
+                    style={{
+                      backgroundColor: '#55acee',
+                      height: '2px',
+                      margin: '30px 0',
+                    }}
+                  />
+                  <Grid container spacing={3}>
                     <Grid item xs={12}>
-                      {flavorCatalog.map(({ name, price }, index) => {
+                      {flavors.map(({ name, price }, index) => {
+                        return currentOrder(name, price, index);
+                      })}
+                      {limited.map(({ name, price }, index) => {
                         return currentOrder(name, price, index);
                       })}
                       <Typography id='total' variant='h7'>
