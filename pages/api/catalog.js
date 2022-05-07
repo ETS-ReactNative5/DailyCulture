@@ -3,6 +3,8 @@ import { Client, Environment } from 'square';
 // package.json sets NODE_ENV in its scripts
 const isProduction = process.env.NODE_ENV === 'production';
 
+const LIMITED_CATEGORY = 'limited';
+
 // Create an instance of the API Client
 // and initialize it with the credentials
 // for the Square account whose assets you want to manage
@@ -26,7 +28,11 @@ export default async (req, res) => {
     const response = await catalogApi.listCatalog();
 
     const individualCategory = response.result.objects.find((object) => {
-      return object.categoryData && object.categoryData.name === 'individual';
+      return (
+        object.categoryData &&
+        (object.categoryData.name === 'individual' ||
+          object.categoryData.name === LIMITED_CATEGORY)
+      );
     });
 
     const individualFlavors = response.result.objects.reduce((acc, object) => {
@@ -55,6 +61,7 @@ export default async (req, res) => {
               ? variation.absentAtLocationIds.includes(location.id)
               : false,
             imageIDs: variation.itemVariationData.imageIds || null,
+            limited: individualCategory.categoryData.name === LIMITED_CATEGORY,
           });
           return accumulator;
         },

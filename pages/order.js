@@ -38,7 +38,7 @@ const useComponentStyles = makeStyles(componentStyles);
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-const minOrder = 23;
+const minOrder = 30;
 
 export default function Order() {
   const classes = useStyles();
@@ -116,10 +116,6 @@ export default function Order() {
       validationSchema: validationSchema,
       onSubmit: async (values) => {
         formik.setSubmitting(true);
-        const flavorValues = flavorCatalog.reduce((acc, flavor) => {
-          acc.push(`${values[flavor.name] || 0} - ${flavor.name}`);
-          return acc;
-        }, []);
 
         const paymentResult = await createPayment(values);
         router.push(paymentResult.checkoutPageUrl);
@@ -139,12 +135,12 @@ export default function Order() {
           key={name}
         >
           <div style={{ paddingRight: '10px' }}>
-          <Image
-            src={imageUrl ? imageUrl : '/img/Bottles-in-fridge.jpg'}
-            alt='liquid gold'
-            width={75}
-            height={75}
-          />
+            <Image
+              src={imageUrl ? imageUrl : '/img/Bottles-in-fridge.jpg'}
+              alt='liquid gold'
+              width={75}
+              height={75}
+            />
           </div>
           <FormControl fullWidth sx={{ m: 1 }}>
             <InputLabel variant='standard' htmlFor='uncontrolled-native'>
