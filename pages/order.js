@@ -204,7 +204,21 @@ export default function Order() {
       );
     }, 0);
 
-    const isOrderMinMet = total < minOrder;
+    const limitedTotal = Object.keys(formik.values).reduce((acc, item) => {
+      const indexOfFlavor = limited.indexOf(
+        limited.find((flavor) => flavor.name === item)
+      );
+      if (indexOfFlavor < 0) {
+        return acc;
+      }
+      return (
+        acc + (limited[indexOfFlavor].price / 100) * (formik.values[item] || 0)
+      );
+    }, 0);
+
+    const grandTotal = total + limitedTotal;
+
+    const isOrderMinMet = grandTotal < minOrder;
 
     const currentOrder = (name, price) => {
       const quantity = formik.values[name];
@@ -244,7 +258,7 @@ export default function Order() {
         locationID,
         order,
         total:
-          total * 100 -
+          grandTotal * 100 -
           flavors[
             flavors.indexOf(
               flavors.find((flavor) => flavor.name === 'Delivery')
@@ -396,7 +410,7 @@ export default function Order() {
                       })}
 
                       <Typography id='total' variant='h7'>
-                        Total: ${total.toFixed(2)}
+                        Total: ${grandTotal.toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>
