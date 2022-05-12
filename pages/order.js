@@ -235,7 +235,26 @@ export default function Order() {
     // to the project server code so that a payment can be created with
     // Payments API
     const createPayment = async (values) => {
-      const order = flavorCatalog.flavors.reduce((acc, flavor) => {
+      const order = flavors.reduce((acc, flavor) => {
+        if (
+          values[flavor.name] === '' ||
+          values[flavor.name] === 0 ||
+          !values[flavor.name]
+        ) {
+          return acc;
+        }
+
+        return [
+          ...acc,
+          {
+            quantity: `${values[flavor.name]}`,
+            basePriceMoney: { amount: parseInt(flavor.price), currency: 'USD' },
+            catalogObjectId: flavor.id,
+          },
+        ];
+      }, []);
+
+      const limitedOrder = limited.reduce((acc, flavor) => {
         if (
           values[flavor.name] === '' ||
           values[flavor.name] === 0 ||
@@ -256,7 +275,7 @@ export default function Order() {
 
       const body = JSON.stringify({
         locationID,
-        order,
+        order: [...limitedOrder, ...order],
         total:
           grandTotal * 100 -
           flavors[
