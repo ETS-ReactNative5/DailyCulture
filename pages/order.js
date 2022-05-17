@@ -61,6 +61,8 @@ export default function Order() {
     limited: [],
   });
 
+  const [loading, setLoading] = React.useState(false);
+
   const { flavors, limited } = flavorCatalog;
   const [locationID, setLocationID] = React.useState(null);
 
@@ -77,6 +79,7 @@ export default function Order() {
   };
 
   React.useEffect(async () => {
+    setLoading(true);
     const flavors = await getCatalog();
     if (!flavors) {
       setError(true);
@@ -90,6 +93,7 @@ export default function Order() {
       a.name > b.name ? 1 : -1
     );
     setFlavorCatalog({ flavors: sortedFlavors, limited: sortedLimitedFlavors });
+    setLoading(false);
     setLocationID(flavors.location.id);
   }, []);
 
@@ -358,16 +362,30 @@ export default function Order() {
               ) : (
                 <>
                   <Grid container spacing={3}>
-                    {flavors.map(
-                      ({ name, description, outOfStock, imageUrl, price }) => {
-                        return dropDown(
+                    {loading ? (
+                      <Grid item xs={12} key={'loading info'}>
+                        <Typography variant='body1' align='center'>
+                          Checking the fridge...
+                        </Typography>
+                      </Grid>
+                    ) : (
+                      flavors.map(
+                        ({
                           name,
                           description,
                           outOfStock,
                           imageUrl,
-                          price
-                        );
-                      }
+                          price,
+                        }) => {
+                          return dropDown(
+                            name,
+                            description,
+                            outOfStock,
+                            imageUrl,
+                            price
+                          );
+                        }
+                      )
                     )}
                   </Grid>
                   <Divider
@@ -387,9 +405,15 @@ export default function Order() {
                     <Grid container spacing={3}>
                       {!limited.length && (
                         <Grid item xs={12} key={'no limited info'}>
-                          <Typography variant='body1' align='center'>
-                            No limited release flavors at this time
-                          </Typography>
+                          {loading ? (
+                            <Typography variant='body1' align='center'>
+                              Deep in the fridge...
+                            </Typography>
+                          ) : (
+                            <Typography variant='body1' align='center'>
+                              No limited release flavors at this time
+                            </Typography>
+                          )}
                         </Grid>
                       )}
                       {limited.map(
