@@ -48,6 +48,12 @@ export default function Where() {
       address: '10695 Roe Ave, Overland Park, KS 66207',
       site: 'https://www.mclainskc.com/overland-park',
     },
+    {
+      name: 'McLain’s Market - Shawnee',
+      GPS: ['39.022312571100215', '-94.71417317313768'],
+      address: '5833 Nieman Rd, Shawnee, KS 66203',
+      site: 'https://www.mclainskc.com/shawnee',
+    },
   ];
 
   const openMap = (GPS) => {
