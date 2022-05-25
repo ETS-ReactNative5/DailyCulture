@@ -47,6 +47,7 @@ export default function Order() {
   const [successOpen, setSuccessOpen] = React.useState(false);
   const [loadingOpen, setLoadingOpen] = React.useState(false);
   const [kegFlavors, setKegFlavors] = React.useState([]);
+  const [canFlavors, setCanFlavors] = React.useState([]);
   const [bottleFlavors, setBottleFlavors] = React.useState([]);
   const [error, setError] = React.useState(false);
   const [invoiceUrl, setInvoiceUrl] = React.useState('');
@@ -137,13 +138,21 @@ export default function Order() {
       return acc;
     }, []);
 
-    const bottleFlavors = flavors.catalog.reduce((acc, flavor) => {
-      if (!flavor.name.includes('KEG')) {
+    const canFlavors = flavors.catalog.reduce((acc, flavor) => {
+      if (flavor.name.toLowerCase().includes('cans')) {
         return [...acc, flavor];
       }
       return acc;
     }, []);
 
+    const bottleFlavors = flavors.catalog.reduce((acc, flavor) => {
+      if (flavor.name.includes('bottles')) {
+        return [...acc, flavor];
+      }
+      return acc;
+    }, []);
+
+    setCanFlavors(canFlavors);
     setKegFlavors(kegFlavors);
     setBottleFlavors(bottleFlavors);
   }, []);
@@ -197,6 +206,14 @@ export default function Order() {
           <option value={2}>2 kegs</option>
           <option value={3}>3 kegs</option>
           <option value={4}>4 kegs</option>
+        </>
+      ) : name.includes('cans') ? (
+        <>
+          <option aria-label='None' value='' />
+          <option value={1}>1 flat (24 cans)</option>
+          <option value={2}>2 flats (48 cans)</option>
+          <option value={3}>3 flats (72 cans)</option>
+          <option value={4}>4 flats (96 cans)</option>
         </>
       ) : (
         <>
@@ -355,6 +372,21 @@ export default function Order() {
                       <h3 align='center'>BY THE BOTTLE</h3>
                     </Grid>
                     {bottleFlavors?.map(({ name, description, outOfStock }) => {
+                      return dropDown(name, description, outOfStock);
+                    })}
+                    <Divider
+                      variant='fullWidth'
+                      style={{
+                        backgroundColor: '#55acee',
+                        height: '2px',
+                        margin: '30px 0',
+                        width: '100%',
+                      }}
+                    />
+                    <Grid item xs={12}>
+                      <h3 align='center'>CANS</h3>
+                    </Grid>
+                    {canFlavors?.map(({ name, description, outOfStock }) => {
                       return dropDown(name, description, outOfStock);
                     })}
                     <Divider
