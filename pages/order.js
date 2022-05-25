@@ -101,6 +101,9 @@ export default function Order() {
       return acc;
     }, []);
 
+    console.log('cans', canFlavors);
+    console.log('cans', sortedFlavors);
+
     const bottleFlavors = sortedFlavors.reduce((acc, flavor) => {
       if (
         flavor?.name?.toLowerCase().includes('oz') ||
