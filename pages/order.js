@@ -94,8 +94,8 @@ export default function Order() {
       a.name > b.name ? 1 : -1
     );
 
-    const canFlavors = flavors.catalog.reduce((acc, flavor) => {
-      if (flavor.description.toLowerCase().includes('cans')) {
+    const canFlavors = sortedFlavors.catalog.reduce((acc, flavor) => {
+      if (flavor?.description?.toLowerCase().includes('cans')) {
         return [...acc, flavor];
       }
       return acc;
@@ -103,8 +103,8 @@ export default function Order() {
 
     const bottleFlavors = sortedFlavors.reduce((acc, flavor) => {
       if (
-        flavor.name.toLowerCase().includes('oz') ||
-        flavor.name.toLowerCase().includes('delivery')
+        flavor?.name?.toLowerCase().includes('oz') ||
+        flavor?.name?.toLowerCase().includes('delivery')
       ) {
         return [...acc, flavor];
       }
