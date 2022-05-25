@@ -179,7 +179,7 @@ export default function Order() {
               <option value={4}>4</option>
             </NativeSelect>
             <FormHelperText>
-              {description} - ${price / 100}
+              {description} - ${(price / 100).toFixed(2)}
             </FormHelperText>
           </FormControl>
           <IconButton

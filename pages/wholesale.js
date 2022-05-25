@@ -491,7 +491,6 @@ export default function Order() {
                     </Grid>
                     <Grid item xs={12} md={4} key={'address'}>
                       <TextField
-                        required
                         fullWidth
                         id='address'
                         name='address'
