@@ -207,7 +207,7 @@ export default function Order() {
           <option value={3}>3 kegs</option>
           <option value={4}>4 kegs</option>
         </>
-      ) : name.includes('cans') ? (
+      ) : name.toLowerCase().includes('cans') ? (
         <>
           <option aria-label='None' value='' />
           <option value={1}>1 flat (24 cans)</option>
