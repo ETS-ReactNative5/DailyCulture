@@ -59,11 +59,12 @@ export default function Order() {
   const [flavorCatalog, setFlavorCatalog] = React.useState({
     flavors: [],
     limited: [],
+    canFlavors: [],
   });
 
   const [loading, setLoading] = React.useState(false);
 
-  const { flavors, limited } = flavorCatalog;
+  const { flavors, limited, canFlavors } = flavorCatalog;
   const [locationID, setLocationID] = React.useState(null);
 
   const getCatalog = async () => {
@@ -92,7 +93,29 @@ export default function Order() {
     const sortedLimitedFlavors = flavors.limited.sort((a, b) =>
       a.name > b.name ? 1 : -1
     );
-    setFlavorCatalog({ flavors: sortedFlavors, limited: sortedLimitedFlavors });
+
+    const canFlavors = flavors.catalog.reduce((acc, flavor) => {
+      if (flavor.description.toLowerCase().includes('cans')) {
+        return [...acc, flavor];
+      }
+      return acc;
+    }, []);
+
+    const bottleFlavors = sortedFlavors.reduce((acc, flavor) => {
+      if (
+        flavor.name.toLowerCase().includes('oz') ||
+        flavor.name.toLowerCase().includes('delivery')
+      ) {
+        return [...acc, flavor];
+      }
+      return acc;
+    }, []);
+
+    setFlavorCatalog({
+      canFlavors,
+      flavors: bottleFlavors,
+      limited: sortedLimitedFlavors,
+    });
     setLoading(false);
     setLocationID(flavors.location.id);
   }, []);
@@ -220,7 +243,20 @@ export default function Order() {
       );
     }, 0);
 
-    const grandTotal = total + limitedTotal;
+    const canTotal = Object.keys(formik.values).reduce((acc, item) => {
+      const indexOfFlavor = canFlavors.indexOf(
+        canFlavors.find((flavor) => flavor.name === item)
+      );
+      if (indexOfFlavor < 0) {
+        return acc;
+      }
+      return (
+        acc +
+        (canFlavors[indexOfFlavor].price / 100) * (formik.values[item] || 0)
+      );
+    }, 0);
+
+    const grandTotal = total + limitedTotal + canTotal;
 
     const isOrderMinMet = grandTotal < minOrder;
 
@@ -277,9 +313,28 @@ export default function Order() {
         ];
       }, []);
 
+      const canOrder = canFlavors.reduce((acc, flavor) => {
+        if (
+          values[flavor.name] === '' ||
+          values[flavor.name] === 0 ||
+          !values[flavor.name]
+        ) {
+          return acc;
+        }
+
+        return [
+          ...acc,
+          {
+            quantity: `${values[flavor.name]}`,
+            basePriceMoney: { amount: parseInt(flavor.price), currency: 'USD' },
+            catalogObjectId: flavor.id,
+          },
+        ];
+      }, []);
+
       const body = JSON.stringify({
         locationID,
-        order: [...limitedOrder, ...order],
+        order: [...limitedOrder, ...canOrder, ...order],
         total:
           grandTotal * 100 -
           flavors[
@@ -362,6 +417,11 @@ export default function Order() {
               ) : (
                 <>
                   <Grid container spacing={3}>
+                    <Grid item xs={12} key={'bottle info'}>
+                      <Typography variant='h5' align='center'>
+                        BOTTLES
+                      </Typography>
+                    </Grid>
                     {loading ? (
                       <Grid item xs={12} key={'loading info'}>
                         <Typography variant='body1' align='center'>
@@ -387,6 +447,53 @@ export default function Order() {
                         }
                       )
                     )}
+                  </Grid>
+                  <Divider
+                    variant='fullWidth'
+                    style={{
+                      backgroundColor: '#55acee',
+                      height: '2px',
+                      margin: '30px 0',
+                    }}
+                  />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} key={'can info'}>
+                      <Typography variant='h5' align='center'>
+                        CANS
+                      </Typography>
+                    </Grid>
+                    <Grid container spacing={3}>
+                      {!limited.length && (
+                        <Grid item xs={12} key={'no can info'}>
+                          {loading ? (
+                            <Typography variant='body1' align='center'>
+                              mustard, pickles, leftovers...
+                            </Typography>
+                          ) : (
+                            <Typography variant='body1' align='center'>
+                              No can flavors at this time
+                            </Typography>
+                          )}
+                        </Grid>
+                      )}
+                      {canFlavors?.map(
+                        ({
+                          name,
+                          description,
+                          outOfStock,
+                          imageUrl,
+                          price,
+                        }) => {
+                          return dropDown(
+                            name,
+                            description,
+                            outOfStock,
+                            imageUrl,
+                            price
+                          );
+                        }
+                      )}
+                    </Grid>
                   </Grid>
                   <Divider
                     variant='fullWidth'
@@ -446,6 +553,9 @@ export default function Order() {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       {limited.map(({ name, price }, index) => {
+                        return currentOrder(name, price, index);
+                      })}
+                      {canFlavors.map(({ name, price }, index) => {
                         return currentOrder(name, price, index);
                       })}
                       {flavors.map(({ name, price }, index) => {
