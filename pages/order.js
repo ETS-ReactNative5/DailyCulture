@@ -94,15 +94,12 @@ export default function Order() {
       a.name > b.name ? 1 : -1
     );
 
-    const canFlavors = sortedFlavors.catalog.reduce((acc, flavor) => {
+    const canFlavors = sortedFlavors.reduce((acc, flavor) => {
       if (flavor?.description?.toLowerCase().includes('cans')) {
         return [...acc, flavor];
       }
       return acc;
     }, []);
-
-    console.log('cans', canFlavors);
-    console.log('cans', sortedFlavors);
 
     const bottleFlavors = sortedFlavors.reduce((acc, flavor) => {
       if (
